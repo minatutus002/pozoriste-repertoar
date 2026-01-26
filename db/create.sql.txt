@@ -1,0 +1,38 @@
+CREATE DATABASE PozoristeRepertoar;
+GO
+
+USE PozoristeRepertoar;
+GO
+
+CREATE TABLE Zanr (
+    ZanrId INT IDENTITY PRIMARY KEY,
+    Naziv NVARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Sala (
+    SalaId INT IDENTITY PRIMARY KEY,
+    Naziv NVARCHAR(50) NOT NULL,
+    Kapacitet INT NOT NULL
+);
+
+CREATE TABLE Predstava (
+    PredstavaId INT IDENTITY PRIMARY KEY,
+    Naziv NVARCHAR(100) NOT NULL,
+    Opis NVARCHAR(500),
+    Cena DECIMAL(10,2) NOT NULL,
+    TrajanjeMin INT NOT NULL,
+    ZanrId INT NOT NULL,
+    CONSTRAINT FK_Predstava_Zanr
+        FOREIGN KEY (ZanrId) REFERENCES Zanr(ZanrId)
+);
+
+CREATE TABLE Termin (
+    TerminId INT IDENTITY PRIMARY KEY,
+    PredstavaId INT NOT NULL,
+    SalaId INT NOT NULL,
+    DatumVreme DATETIME NOT NULL,
+    CONSTRAINT FK_Termin_Predstava
+        FOREIGN KEY (PredstavaId) REFERENCES Predstava(PredstavaId),
+    CONSTRAINT FK_Termin_Sala
+        FOREIGN KEY (SalaId) REFERENCES Sala(SalaId)
+);

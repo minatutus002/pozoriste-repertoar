@@ -1,0 +1,16 @@
+USE PozoristeRepertoar;
+
+INSERT INTO Zanr (Naziv)
+VALUES ('Drama'), ('Komedija'), ('Mjuzikl');
+
+INSERT INTO Sala (Naziv, Kapacitet)
+VALUES ('Velika sala', 300),
+       ('Mala sala', 120);
+
+INSERT INTO Predstava (Naziv, Opis, Cena, TrajanjeMin, ZanrId)
+VALUES ('Balkanski spijun', 'Poznata domaća drama', 800, 120, 1),
+       ('Zona Zamfirova', 'Romantična komedija', 700, 110, 2);
+
+INSERT INTO Termin (PredstavaId, SalaId, DatumVreme)
+VALUES (1, 1, '2026-01-25 19:00'),
+       (2, 2, '2026-01-26 20:00');
