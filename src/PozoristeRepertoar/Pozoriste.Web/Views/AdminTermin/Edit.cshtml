@@ -1,0 +1,46 @@
+﻿@model Pozoriste.Web.Models.TerminCreateVM
+
+@{
+    ViewData["Title"] = "Izmeni termin";
+    var terminId = (int)ViewBag.TerminId;
+}
+
+<h1>Izmeni termin</h1>
+
+<form asp-action="Edit" asp-route-id="@terminId" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="PredstavaId" class="form-label">Predstava</label>
+        <select asp-for="PredstavaId" class="form-select" asp-items="Model.Predstave">
+            <option value="">-- izaberi predstavu --</option>
+        </select>
+        <span asp-validation-for="PredstavaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SalaId" class="form-label">Sala</label>
+        <select asp-for="SalaId" class="form-select" asp-items="Model.Sale">
+            <option value="">-- izaberi salu --</option>
+        </select>
+        <span asp-validation-for="SalaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DatumVreme" class="form-label">Datum i vreme</label>
+
+        <input asp-for="DatumVreme"
+               class="form-control"
+               type="datetime-local"
+               step="60" />
+
+        <span asp-validation-for="DatumVreme" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Sačuvaj izmene</button>
+    <a asp-action="Index" class="btn btn-secondary">Nazad</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

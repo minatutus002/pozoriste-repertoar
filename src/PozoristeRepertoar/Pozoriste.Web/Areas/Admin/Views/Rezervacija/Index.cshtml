@@ -1,0 +1,92 @@
+@model IEnumerable<Pozoriste.Web.Models.AdminRezervacijaRowVM>
+@using Pozoriste.Models.Entities
+@{
+    ViewData["Title"] = "Rezervacije";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Rezervacije</h2>
+</div>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Korisnik</th>
+            <th>Predstava</th>
+            <th>Sala</th>
+            <th>Termin</th>
+            <th>Karata</th>
+            <th>Sedista</th>
+            <th>Status</th>
+            <th>Ukupno</th>
+            <th class="text-end"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.KorisnikEmail</td>
+                <td>@r.Predstava</td>
+                <td>@r.Sala</td>
+                <td>@r.DatumVreme.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@r.BrojKarata</td>
+                <td>@(string.IsNullOrWhiteSpace(r.Sedista) ? "-" : r.Sedista)</td>
+                <td>
+                    @switch (r.Status)
+                    {
+                        case RezervacijaStatus.Rezervisano:
+                            <span class="badge bg-warning text-dark">Rezervisano</span>
+                            break;
+                        case RezervacijaStatus.Placeno:
+                            <span class="badge bg-success">Placeno</span>
+                            break;
+                        case RezervacijaStatus.Otkazano:
+                            <span class="badge bg-secondary">Otkazano</span>
+                            break;
+                        case RezervacijaStatus.OtkazivanjeNaCekanju:
+                            <span class="badge bg-info text-dark">Ceka otkazivanje</span>
+                            break;
+                        case RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno:
+                            <span class="badge bg-info text-dark">Ceka otkaz (placeno)</span>
+                            break;
+                        case RezervacijaStatus.Refundiran:
+                            <span class="badge bg-primary">Refundiran</span>
+                            break;
+                    }
+                </td>
+                <td>@r.Ukupno.ToString("0.00")</td>
+                <td class="text-end">
+                    @if (r.Status == RezervacijaStatus.Rezervisano)
+                    {
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="MarkPaid" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@r.RezervacijaId" />
+                            <button class="btn btn-sm btn-outline-success">Oznaci placeno</button>
+                        </form>
+                    }
+                    @if (r.Status == RezervacijaStatus.OtkazivanjeNaCekanju ||
+                         r.Status == RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno)
+                    {
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="ApproveCancel" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@r.RezervacijaId" />
+                            <button class="btn btn-sm btn-outline-success"
+                                    onclick="return confirm('Odobriti otkazivanje rezervacije?');">
+                                Odobri otkaz
+                            </button>
+                        </form>
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="RejectCancel" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@r.RezervacijaId" />
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Odbiti zahtev za otkazivanje?');">
+                                Odbij
+                            </button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

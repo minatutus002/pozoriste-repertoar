@@ -1,0 +1,41 @@
+@model Pozoriste.Models.Entities.Sala
+@{
+    ViewData["Title"] = "Izmeni salu";
+}
+
+<h2 class="mb-3">Izmeni salu</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SalaId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Naziv</label>
+        <input class="form-control" asp-for="Naziv" />
+        <span class="text-danger" asp-validation-for="Naziv"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Broj redova</label>
+            <input class="form-control" asp-for="BrojRedova" type="number" min="1" />
+            <span class="text-danger" asp-validation-for="BrojRedova"></span>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Sedista po redu</label>
+            <input class="form-control" asp-for="SedistaPoRedu" type="number" min="1" />
+            <span class="text-danger" asp-validation-for="SedistaPoRedu"></span>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button class="btn btn-primary" type="submit">Sacuvaj</button>
+        <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Sala" asp-action="Index">Nazad</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

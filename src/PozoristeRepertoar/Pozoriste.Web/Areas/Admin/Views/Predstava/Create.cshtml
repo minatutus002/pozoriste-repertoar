@@ -1,0 +1,60 @@
+@model Pozoriste.Models.Entities.Predstava
+@{
+    ViewData["Title"] = "Dodaj predstavu";
+}
+
+<h2 class="mb-3">Dodaj predstavu</h2>
+
+<form method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Naziv</label>
+        <input class="form-control" asp-for="Naziv" />
+        <span class="text-danger" asp-validation-for="Naziv"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Opis</label>
+        <textarea class="form-control" asp-for="Opis" rows="4"></textarea>
+        <span class="text-danger" asp-validation-for="Opis"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Slika</label>
+        <input class="form-control" type="file" name="slika" accept="image/*" />
+        <span class="text-danger" asp-validation-for="SlikaUrl"></span>
+        <div class="form-text">Dozvoljeni formati: JPG, PNG, WEBP.</div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Cena</label>
+            <input class="form-control" asp-for="Cena" type="number" step="100" min="500" />
+            <span class="text-danger" asp-validation-for="Cena"></span>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Trajanje (min)</label>
+            <input class="form-control" asp-for="TrajanjeMin" type="number" min="1" />
+            <span class="text-danger" asp-validation-for="TrajanjeMin"></span>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Zanr</label>
+            <select class="form-select" asp-for="ZanrId" asp-items="ViewBag.Zanrovi">
+                <option value="">-- izaberi zanr --</option>
+            </select>
+            <span class="text-danger" asp-validation-for="ZanrId"></span>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button class="btn btn-primary" type="submit">Sacuvaj</button>
+        <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Predstava" asp-action="Index">Nazad</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

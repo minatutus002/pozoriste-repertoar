@@ -1,0 +1,45 @@
+@model IEnumerable<Pozoriste.Models.Entities.Sala>
+@{
+    ViewData["Title"] = "Sale";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Sale</h2>
+    <a class="btn btn-primary" asp-area="Admin" asp-controller="Sala" asp-action="Create">+ Dodaj</a>
+</div>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Naziv</th>
+            <th>Redovi</th>
+            <th>Sedista/Red</th>
+            <th>Kapacitet</th>
+            <th class="text-end"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Naziv</td>
+                <td>@s.BrojRedova</td>
+                <td>@s.SedistaPoRedu</td>
+                <td>@s.Kapacitet</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary"
+                       asp-area="Admin" asp-controller="Sala" asp-action="Edit" asp-route-id="@s.SalaId">Izmeni</a>
+
+                    <form asp-area="Admin" asp-controller="Sala" asp-action="Delete" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@s.SalaId" />
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Obrisati salu?');">
+                            Obrisi
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

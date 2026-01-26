@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Admin panel";
+}
+
+<h2 class="mb-3">Admin panel</h2>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Predstave</h5>
+            <p class="text-muted mb-3">Dodaj/izmeni/obriši predstave.</p>
+            <a class="btn btn-outline-primary"
+               asp-area="Admin" asp-controller="Predstava" asp-action="Index">Upravljaj</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Žanrovi</h5>
+            <p class="text-muted mb-3">Dodaj/izmeni/obriši žanrove.</p>
+            <a class="btn btn-outline-primary"
+               asp-area="Admin" asp-controller="Zanr" asp-action="Index">Upravljaj</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Sale</h5>
+            <p class="text-muted mb-3">Dodaj/izmeni/obriši sale.</p>
+            <a class="btn btn-outline-primary"
+               asp-area="Admin" asp-controller="Sala" asp-action="Index">Upravljaj</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Termini</h5>
+            <p class="text-muted mb-3">Dodaj/izmeni/obriši termine.</p>
+            <a class="btn btn-outline-primary"
+               asp-area="Admin" asp-controller="Termin" asp-action="Index">Upravljaj</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Rezervacije</h5>
+            <p class="text-muted mb-3">Pregled svih rezervacija korisnika.</p>
+            <a class="btn btn-outline-primary"
+               asp-area="Admin" asp-controller="Rezervacija" asp-action="Index">Upravljaj</a>
+        </div>
+    </div>
+</div>

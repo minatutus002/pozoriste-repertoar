@@ -1,0 +1,38 @@
+﻿@model Pozoriste.Models.Entities.Termin
+@{
+    ViewData["Title"] = "Dodaj termin";
+}
+
+<h2 class="mb-3">Dodaj termin</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label">Predstava</label>
+        <select class="form-select" asp-for="PredstavaId" asp-items="ViewBag.Predstave"></select>
+        <span asp-validation-for="PredstavaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Sala</label>
+        <select class="form-select" asp-for="SalaId" asp-items="ViewBag.Sale"></select>
+        <span asp-validation-for="SalaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Datum i vreme</label>
+        <input class="form-control" asp-for="DatumVreme" type="datetime-local"
+               value="@Model.DatumVreme.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="DatumVreme" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Sačuvaj</button>
+    <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Termin" asp-action="Index">Nazad</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
