@@ -1,0 +1,52 @@
+﻿@model Pozoriste.Web.Models.TerminCreateVM
+
+@{
+    ViewData["Title"] = "Dodaj termin";
+}
+
+<h1>Dodaj termin</h1>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <!-- Prikazuje sve greške u vrhu forme -->
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="PredstavaId" class="form-label">Predstava</label>
+        <select asp-for="PredstavaId" class="form-select" asp-items="Model.Predstave">
+            <option value="">-- izaberi predstavu --</option>
+        </select>
+        <span asp-validation-for="PredstavaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SalaId" class="form-label">Sala</label>
+        <select asp-for="SalaId" class="form-select" asp-items="Model.Sale">
+            <option value="">-- izaberi salu --</option>
+        </select>
+        <span asp-validation-for="SalaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DatumVreme" class="form-label">Datum i vreme</label>
+
+       
+        <input asp-for="DatumVreme"
+               class="form-control"
+               type="datetime-local"
+               value="@(Model?.DatumVreme.HasValue == true
+                           ? Model.DatumVreme.Value.ToString("yyyy-MM-ddTHH:mm")
+                           : "")" />
+
+
+        <span asp-validation-for="DatumVreme" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Sačuvaj</button>
+    <a asp-action="Index" class="btn btn-secondary">Nazad</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

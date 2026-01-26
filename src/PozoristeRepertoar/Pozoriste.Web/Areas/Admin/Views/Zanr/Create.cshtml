@@ -1,0 +1,23 @@
+@model Pozoriste.Models.Entities.Zanr
+@{
+    ViewData["Title"] = "Dodaj zanr";
+}
+
+<h2 class="mb-3">Dodaj zanr</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Naziv</label>
+        <input class="form-control" asp-for="Naziv" />
+        <span class="text-danger" asp-validation-for="Naziv"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Sacuvaj</button>
+    <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Zanr" asp-action="Index">Nazad</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
