@@ -1,0 +1,149 @@
+@model Pozoriste.Web.Models.RepertoarIndexVM
+
+@{
+    ViewData["Title"] = "Repertoar";
+    var fromValue = Model.DateFrom?.ToString("yyyy-MM-dd") ?? string.Empty;
+    var toValue = Model.DateTo?.ToString("yyyy-MM-dd") ?? string.Empty;
+    var selectedZanr = Model.Zanrovi.FirstOrDefault(z => z.Selected)?.Text;
+    var selectedSala = Model.Sale.FirstOrDefault(s => s.Selected)?.Text;
+    var total = Model.Items?.Count ?? 0;
+    var today = DateTime.Today;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Repertoar</h2>
+    <a class="btn btn-sm btn-outline-primary" asp-controller="Predstava" asp-action="Index">Sve predstave</a>
+</div>
+
+<form method="get" class="card p-3 p-md-4 mb-4 repertoar-filters">
+    <div class="repertoar-filter-grid">
+        <div>
+            <label class="form-label">Od datuma</label>
+            <input class="form-control" type="date" name="dateFrom" value="@fromValue" />
+        </div>
+        <div>
+            <label class="form-label">Do datuma</label>
+            <input class="form-control" type="date" name="dateTo" value="@toValue" />
+        </div>
+        <div>
+            <label class="form-label">Zanr</label>
+            <select class="form-select" name="zanrId">
+                <option value="">Svi zanrovi</option>
+                @foreach (var z in Model.Zanrovi)
+                {
+                    <option value="@z.Value" selected="@z.Selected">@z.Text</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Sala</label>
+            <select class="form-select" name="salaId">
+                <option value="">Sve sale</option>
+                @foreach (var s in Model.Sale)
+                {
+                    <option value="@s.Value" selected="@s.Selected">@s.Text</option>
+                }
+            </select>
+        </div>
+        <div class="repertoar-filter-actions">
+            <button class="btn btn-primary w-100" type="submit">Primeni</button>
+            @if (Model.HasFilters)
+            {
+                <a class="btn btn-outline-secondary w-100" asp-controller="Repertoar" asp-action="Index">Resetuj</a>
+            }
+        </div>
+    </div>
+
+    <div class="repertoar-summary mt-3">
+        <div class="text-muted small">Prikazano: @total termina</div>
+        @if (Model.HasFilters)
+        {
+            <div class="repertoar-chips">
+                @if (!string.IsNullOrWhiteSpace(selectedZanr))
+                {
+                    <span class="repertoar-chip">Zanr: @selectedZanr</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(selectedSala))
+                {
+                    <span class="repertoar-chip">Sala: @selectedSala</span>
+                }
+                @if (Model.DateFrom.HasValue)
+                {
+                    <span class="repertoar-chip">Od: @Model.DateFrom.Value.ToString("dd.MM.yyyy")</span>
+                }
+                @if (Model.DateTo.HasValue)
+                {
+                    <span class="repertoar-chip">Do: @Model.DateTo.Value.ToString("dd.MM.yyyy")</span>
+                }
+            </div>
+        }
+    </div>
+</form>
+
+@if (Model.Items == null || !Model.Items.Any())
+{
+    <div class="alert alert-info">
+        Nema zakazanih termina za izabrane filtere.
+    </div>
+}
+else
+{
+    <div class="repertoar-grid">
+        @{
+            var cardIndex = 0;
+        }
+        @foreach (var r in Model.Items)
+        {
+            var isSoldOut = r.Slobodno <= 0;
+            var isSoon = r.DatumVreme.Date >= today && r.DatumVreme.Date <= today.AddDays(3);
+
+            <article class="card repertoar-card poster-only stagger-item" style="--delay:@(cardIndex * 40)ms">
+                <div class="repertoar-img-wrap">
+                    @if (!string.IsNullOrWhiteSpace(r.SlikaUrl))
+                    {
+                        <img src="@r.SlikaUrl" alt="@r.Naziv" class="repertoar-img" />
+                    }
+                    else
+                    {
+                        <div class="repertoar-img placeholder"></div>
+                    }
+                    <a class="stretched-link poster-details-link"
+                       asp-controller="Predstava"
+                       asp-action="Details"
+                       asp-route-id="@r.PredstavaId"
+                       aria-label="@r.Naziv">
+                        <span class="visually-hidden">Detalji</span>
+                    </a>
+
+                    @if (isSoldOut)
+                    {
+                        <span class="poster-badge poster-badge-soldout">Rasprodato</span>
+                    }
+                    else if (isSoon)
+                    {
+                        <span class="poster-badge poster-badge-soon">Uskoro</span>
+                    }
+
+                    <div class="poster-overlay">
+                        <div>
+                            <div class="poster-overlay-title">@r.Naziv</div>
+                            <div class="poster-overlay-meta">@r.Zanr</div>
+                        </div>
+                        <span class="poster-overlay-action">Detalji</span>
+                    </div>
+
+                    @if (!isSoldOut)
+                    {
+                        <a class="poster-reserve-btn"
+                           asp-controller="Rezervacija"
+                           asp-action="Create"
+                           asp-route-terminId="@r.TerminId">
+                            Rezervisi
+                        </a>
+                    }
+                </div>
+            </article>
+            cardIndex++;
+        }
+    </div>
+}

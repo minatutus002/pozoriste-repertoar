@@ -1,0 +1,53 @@
+@model IEnumerable<Pozoriste.Models.Entities.Predstava>
+
+@{
+    ViewData["Title"] = "Predstave";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Predstave</h2>
+    <a class="btn btn-sm btn-outline-primary" asp-controller="Repertoar" asp-action="Index">Repertoar</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">Trenutno nema unetih predstava.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var p in Model)
+        {
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrWhiteSpace(p.SlikaUrl))
+                    {
+                        <a asp-controller="Predstava" asp-action="Details" asp-route-id="@p.PredstavaId">
+                            <img src="@p.SlikaUrl" alt="@p.Naziv" class="card-img-top predstava-img-full" />
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="predstava-img-full placeholder"></div>
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="repertoar-title"
+                               asp-controller="Predstava"
+                               asp-action="Details"
+                               asp-route-id="@p.PredstavaId">
+                                @p.Naziv
+                            </a>
+                        </h5>
+                        <div class="text-muted small mb-2">@((p.Zanr?.Naziv) ?? "-")</div>
+                        <p class="card-text text-muted small">@p.Opis</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="fw-semibold">@p.Cena.ToString("0.00")</span>
+                            <span class="text-muted small">@p.TrajanjeMin min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

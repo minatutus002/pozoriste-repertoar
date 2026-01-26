@@ -1,0 +1,54 @@
+﻿@{
+    Layout = null;
+    var title = ViewData["Title"]?.ToString() ?? "Pozorište";
+}
+
+<!doctype html>
+<html lang="sr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title - Pozorište</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="auth2-bg">
+    <div class="auth2-wrap">
+        <div class="auth2-shell">
+            <div class="auth2-left">
+                <div class="auth2-bubbles" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </div>
+
+                <div class="auth2-left-content">
+                    <div class="auth2-brand">Pozorište</div>
+                    <h1 class="auth2-title">@title</h1>
+                    <p class="auth2-text">
+                        Prijavi se da rezervišeš termine, pregledaš repertoar i upravljaš svojim rezervacijama.
+                    </p>
+
+                    <div class="auth2-badges">
+                        <span class="badge rounded-pill">Repertoar</span>
+                        <span class="badge rounded-pill">Sale</span>
+                        <span class="badge rounded-pill">Termini</span>
+                        <span class="badge rounded-pill">Rezervacije</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth2-right">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

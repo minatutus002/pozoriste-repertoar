@@ -1,0 +1,120 @@
+@model IEnumerable<Pozoriste.Models.Entities.Rezervacija>
+@using Pozoriste.Models.Entities
+
+@{
+    ViewData["Title"] = "Moje rezervacije";
+}
+
+@functions {
+    private static string SeatLabel(int row, int seat)
+    {
+        if (row >= 1 && row <= 26)
+            return $"{(char)('A' + row - 1)}{seat}";
+
+        return $"{row}{seat}";
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Moje rezervacije</h2>
+    <a class="btn btn-sm btn-primary" asp-controller="Repertoar" asp-action="Index">Nova rezervacija</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        Nemas nijednu rezervaciju.
+    </div>
+}
+else
+{
+    <div class="reservation-list">
+        @foreach (var r in Model)
+        {
+            var sedista = r.Sedista?
+                .OrderBy(s => s.Red)
+                .ThenBy(s => s.Broj)
+                .Select(s => SeatLabel(s.Red, s.Broj))
+                .ToList() ?? new List<string>();
+
+            var ukupno = (r.Termin?.Predstava?.Cena ?? 0m) * r.BrojKarata;
+            var statusClass = r.Status switch
+            {
+                RezervacijaStatus.Placeno => "bg-success",
+                RezervacijaStatus.Otkazano => "bg-secondary",
+                RezervacijaStatus.OtkazivanjeNaCekanju => "bg-info text-dark",
+                RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno => "bg-info text-dark",
+                RezervacijaStatus.Refundiran => "bg-primary",
+                _ => "bg-warning text-dark"
+            };
+
+            var statusLabel = r.Status switch
+            {
+                RezervacijaStatus.Rezervisano => "Rezervisano",
+                RezervacijaStatus.Placeno => "Placeno",
+                RezervacijaStatus.Otkazano => "Otkazano",
+                RezervacijaStatus.OtkazivanjeNaCekanju => "Ceka otkazivanje",
+                RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno => "Ceka refundaciju",
+                RezervacijaStatus.Refundiran => "Refundiran",
+                _ => r.Status.ToString()
+            };
+
+            <article class="card reservation-item">
+                <div class="reservation-item-header">
+                    <div>
+                        <div class="reservation-title">@(r.Termin?.Predstava?.Naziv ?? "-")</div>
+                        <div class="text-muted small">
+                            @(r.Termin?.Sala?.Naziv ?? "-") &middot; @(r.Termin?.DatumVreme.ToString("dd.MM.yyyy HH:mm") ?? "-")
+                        </div>
+                    </div>
+                    <span class="badge @statusClass">@statusLabel</span>
+                </div>
+
+                <div class="reservation-meta-grid">
+                    <div>
+                        <div class="reservation-meta-label">Karata</div>
+                        <div class="fw-semibold">@r.BrojKarata</div>
+                    </div>
+                    <div>
+                        <div class="reservation-meta-label">Ukupno</div>
+                        <div class="fw-semibold">@ukupno.ToString("0.00") RSD</div>
+                    </div>
+                </div>
+
+                <div class="reservation-seat-list">
+                    @if (sedista.Count == 0)
+                    {
+                        <span class="text-muted small">Nema izabranih sedista.</span>
+                    }
+                    else
+                    {
+                        @foreach (var seat in sedista)
+                        {
+                            <span class="seat-pill">@seat</span>
+                        }
+                    }
+                </div>
+
+                <div class="reservation-item-actions">
+                    <a class="btn btn-sm btn-outline-primary"
+                       asp-action="Checkout"
+                       asp-route-id="@r.RezervacijaId">
+                        Detalji
+                    </a>
+                    @if (r.Status == RezervacijaStatus.Rezervisano || r.Status == RezervacijaStatus.Placeno)
+                    {
+                        <form asp-action="RequestCancel" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@r.RezervacijaId" />
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Poslati zahtev za otkazivanje?');">
+                                Zatrazi otkazivanje
+                            </button>
+                        </form>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+}

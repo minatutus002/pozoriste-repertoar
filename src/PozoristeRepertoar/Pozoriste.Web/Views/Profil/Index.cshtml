@@ -1,0 +1,145 @@
+@using Pozoriste.Models.Entities
+@model List<Rezervacija>
+
+@{
+    ViewData["Title"] = "Moj profil";
+    Layout = "_Layout";
+}
+
+<div class="section-surface p-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle border" style="width:44px;height:44px; background: linear-gradient(135deg, rgba(79,70,229,.25), rgba(6,182,212,.22));"></div>
+            <div>
+                <h1 class="h4 mb-1">Moj profil</h1>
+                <div class="text-muted small">@ViewBag.Email</div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-primary"
+               asp-area="Identity" asp-page="/Account/Manage/Index">
+                Podesavanja
+            </a>
+
+            <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-danger">Odjava</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-8">
+        <div class="card p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="h5 m-0">Moje rezervacije</h2>
+                    <div class="text-muted small">Pregled svih tvojih rezervisanih termina.</div>
+                </div>
+
+                <a class="btn btn-sm btn-primary"
+                   asp-controller="Repertoar" asp-action="Index">
+                    Nova rezervacija
+                </a>
+            </div>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    Trenutno nemas nijednu rezervaciju.
+                </div>
+            }
+            else
+            {
+                <div class="reservation-list">
+                    @foreach (var r in Model ?? new List<Rezervacija>())
+                    {
+                        if (r == null)
+                        {
+                            continue;
+                        }
+
+                        var statusClass = r.Status switch
+                        {
+                            RezervacijaStatus.Placeno => "bg-success",
+                            RezervacijaStatus.Otkazano => "bg-secondary",
+                            RezervacijaStatus.OtkazivanjeNaCekanju => "bg-info text-dark",
+                            RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno => "bg-info text-dark",
+                            RezervacijaStatus.Refundiran => "bg-primary",
+                            _ => "bg-warning text-dark"
+                        };
+
+                        var statusLabel = r.Status switch
+                        {
+                            RezervacijaStatus.Rezervisano => "Rezervisano",
+                            RezervacijaStatus.Placeno => "Placeno",
+                            RezervacijaStatus.Otkazano => "Otkazano",
+                            RezervacijaStatus.OtkazivanjeNaCekanju => "Ceka otkazivanje",
+                            RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno => "Ceka refundaciju",
+                            RezervacijaStatus.Refundiran => "Refundiran",
+                            _ => r.Status.ToString()
+                        };
+
+                        <article class="card reservation-item">
+                            <div class="reservation-item-header">
+                                <div>
+                                    <div class="reservation-title">@((r?.Termin?.Predstava?.Naziv) ?? "-")</div>
+                                    <div class="text-muted small">
+                                        @((r?.Termin?.Sala?.Naziv) ?? "-") &middot;
+                                        @(r?.Termin != null ? r.Termin.DatumVreme.ToString("dd.MM.yyyy HH:mm") : "-")
+                                    </div>
+                                </div>
+                                <span class="badge @statusClass">@statusLabel</span>
+                            </div>
+
+                            <div class="reservation-item-actions">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="Rezervacija"
+                                   asp-action="Checkout"
+                                   asp-route-id="@r!.RezervacijaId">
+                                    Detalji
+                                </a>
+                                @if (r!.Status == RezervacijaStatus.Rezervisano || r.Status == RezervacijaStatus.Placeno)
+                                {
+                                    <form asp-controller="Rezervacija" asp-action="RequestCancel" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@(r?.RezervacijaId ?? 0)" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Poslati zahtev za otkazivanje?');">
+                                            Zatrazi otkazivanje
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card p-3 p-md-4">
+            <h2 class="h5 mb-2">Nalog</h2>
+            <div class="text-muted small mb-3">Osnovne informacije o tvom nalogu.</div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <div class="text-muted small">Email</div>
+                <div class="fw-semibold">@ViewBag.Email</div>
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+                <a class="btn btn-outline-primary"
+                   asp-area="Identity" asp-page="/Account/Manage/Index">
+                    Podesavanja profila
+                </a>
+                <a class="btn btn-outline-secondary"
+                   asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                    Promeni lozinku
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
