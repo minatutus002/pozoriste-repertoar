@@ -1,0 +1,164 @@
+@model Pozoriste.Web.Models.HomeIndexVM
+
+@{
+    ViewData["Title"] = "Početna";
+    var featured = Model.Predstave.FirstOrDefault(p => !string.IsNullOrWhiteSpace(p.SlikaUrl))
+        ?? Model.Predstave.FirstOrDefault();
+    var upcoming = Model.Termini
+        .OrderBy(t => t.DatumVreme)
+        .Take(6)
+        .ToList();
+}
+
+<div class="py-4">
+    <section class="home-hero card p-4 p-md-5 mb-5">
+        <div class="row g-4 align-items-center">
+            <div class="col-12 col-lg-6">
+                <div class="text-uppercase small text-muted fw-semibold">Repertoar pozorišta</div>
+                <h1 class="home-hero-title mt-2">Sve predstave i termini na jednom mestu</h1>
+                <p class="text-muted mt-2">Prikaz najaktuelnijih predstava, termina i sala uz brzu rezervaciju.</p>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a class="btn btn-primary" asp-controller="Repertoar" asp-action="Index">Pogledaj repertoar</a>
+                    <a class="btn btn-outline-primary" asp-controller="Predstava" asp-action="Index">Sve predstave</a>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="home-hero-poster">
+                    @if (featured != null && !string.IsNullOrWhiteSpace(featured.SlikaUrl))
+                    {
+                        <img src="@featured.SlikaUrl" alt="@featured.Naziv" class="home-hero-img" />
+                    }
+                    else
+                    {
+                        <div class="home-hero-placeholder"></div>
+                    }
+                </div>
+                @if (featured != null)
+                {
+                    <div class="home-hero-caption">
+                        <div class="fw-semibold">@featured.Naziv</div>
+                        <div class="text-muted small">@featured.Zanr?.Naziv</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="home-section mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 m-0">Na repertoaru</h2>
+            <a class="btn btn-sm btn-outline-primary" asp-controller="Predstava" asp-action="Index">Sve predstave</a>
+        </div>
+
+        @if (Model.Predstave == null || Model.Predstave.Count == 0)
+        {
+            <div class="alert alert-info">Trenutno nema unetih predstava.</div>
+        }
+        else
+        {
+            <div class="poster-grid">
+                @{
+                    var posterIndex = 0;
+                }
+                @foreach (var p in Model.Predstave.Take(6))
+                {
+                    <article class="poster-card stagger-item" style="--delay:@(posterIndex * 40)ms">
+                        <a class="poster-img-wrap"
+                           asp-controller="Predstava"
+                           asp-action="Details"
+                           asp-route-id="@p.PredstavaId">
+                            @if (!string.IsNullOrWhiteSpace(p.SlikaUrl))
+                            {
+                                <img src="@p.SlikaUrl" alt="@p.Naziv" class="poster-img" />
+                            }
+                            else
+                            {
+                                <div class="poster-img placeholder"></div>
+                            }
+                            <div class="poster-overlay">
+                                <div>
+                                    <div class="poster-overlay-title">@p.Naziv</div>
+                                    <div class="poster-overlay-meta">@p.Zanr?.Naziv</div>
+                                </div>
+                                <span class="poster-overlay-action">Detalji</span>
+                            </div>
+                        </a>
+                        <div class="poster-caption">
+                            <div class="poster-title">@p.Naziv</div>
+                            <div class="poster-meta">@p.Zanr?.Naziv</div>
+                        </div>
+                    </article>
+                    posterIndex++;
+                }
+            </div>
+        }
+    </section>
+
+    <section class="home-section mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 m-0">Uskoro</h2>
+            <a class="btn btn-sm btn-outline-primary" asp-controller="Repertoar" asp-action="Index">Svi termini</a>
+        </div>
+
+        @if (upcoming.Count == 0)
+        {
+            <div class="alert alert-info">Trenutno nema zakazanih termina.</div>
+        }
+        else
+        {
+            <div class="upcoming-grid">
+                @foreach (var t in upcoming)
+                {
+                    <div class="card p-3 upcoming-card">
+                        <div class="upcoming-title">@t.Predstava?.Naziv</div>
+                        <div class="text-muted small">@t.Predstava?.Zanr?.Naziv</div>
+                        <div class="upcoming-meta">
+                            <span>@t.DatumVreme.ToString("dd.MM.yyyy")</span>
+                            <span>@t.DatumVreme.ToString("HH:mm")</span>
+                            <span>@t.Sala?.Naziv</span>
+                        </div>
+                        <a class="btn btn-sm btn-primary"
+                           asp-controller="Rezervacija"
+                           asp-action="Create"
+                           asp-route-terminId="@t.TerminId">
+                            Rezervisi
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="home-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 m-0">Sale</h2>
+            <a class="btn btn-sm btn-outline-primary" asp-controller="Sala" asp-action="Index">Sve sale</a>
+        </div>
+
+        @if (Model.Sale == null || Model.Sale.Count == 0)
+        {
+            <div class="alert alert-info">Trenutno nema unetih sala.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var s in Model.Sale.Take(6))
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card h-100 p-3">
+                            <div class="fw-semibold">@s.Naziv</div>
+                            <div class="text-muted small">Kapacitet: @s.Kapacitet</div>
+                            <div class="text-muted small">Redovi: @s.BrojRedova, Sedista: @s.SedistaPoRedu</div>
+                            <a class="btn btn-sm btn-outline-primary mt-3"
+                               asp-controller="Repertoar"
+                               asp-action="Index"
+                               asp-route-salaId="@s.SalaId">
+                                Repertoar sale
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+</div>

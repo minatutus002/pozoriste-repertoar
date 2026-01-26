@@ -1,0 +1,157 @@
+@model Pozoriste.Web.Models.PredstavaDetailsVM
+
+@{
+    ViewData["Title"] = Model.Naziv;
+    var nextTerm = Model.Termini?.FirstOrDefault();
+    var nextAvailable = Model.Termini?.FirstOrDefault(t => t.Slobodno > 0);
+}
+
+<div class="card p-3 p-md-4 mb-4 predstava-hero-card">
+    <div class="row g-4 align-items-start">
+        <div class="col-12 col-lg-5">
+            <div class="predstava-hero">
+                @if (!string.IsNullOrWhiteSpace(Model.SlikaUrl))
+                {
+                    <img src="@Model.SlikaUrl" alt="@Model.Naziv" class="predstava-hero-img" />
+                }
+                else
+                {
+                    <div class="predstava-hero placeholder"></div>
+                }
+            </div>
+        </div>
+        <div class="col-12 col-lg-7">
+            <div class="predstava-header mb-3">
+                <div class="text-muted text-uppercase small fw-semibold">Predstava</div>
+                <h1 class="predstava-title mb-2">@Model.Naziv</h1>
+                <div class="predstava-tags">
+                    <span class="predstava-tag">@Model.Zanr</span>
+                    <span class="predstava-tag">@Model.TrajanjeMin min</span>
+                </div>
+            </div>
+
+            <div class="predstava-info-grid">
+                <div class="predstava-info-box">
+                    <div class="text-muted small">Cena</div>
+                    <div class="predstava-price">@Model.Cena.ToString("0.00") RSD</div>
+                </div>
+                <div class="predstava-info-box">
+                    <div class="text-muted small">Trajanje</div>
+                    <div class="fw-semibold">@Model.TrajanjeMin min</div>
+                </div>
+                <div class="predstava-info-box">
+                    <div class="text-muted small">Zanr</div>
+                    <div class="fw-semibold">@Model.Zanr</div>
+                </div>
+            </div>
+
+            <div class="predstava-description mt-3">
+                <div class="text-muted small fw-semibold mb-1">Opis</div>
+                <p class="text-muted mb-0">@Model.Opis</p>
+            </div>
+
+            <div class="predstava-cta mt-3 d-flex flex-wrap gap-2">
+                @if (nextAvailable != null)
+                {
+                    <a class="btn btn-primary"
+                       asp-controller="Rezervacija"
+                       asp-action="Create"
+                       asp-route-terminId="@nextAvailable.TerminId">
+                        Rezervisi najblizi termin
+                    </a>
+                }
+                else if (nextTerm != null)
+                {
+                    <span class="badge bg-secondary">Trenutno nema slobodnih mesta</span>
+                }
+                else
+                {
+                    <span class="badge bg-light text-dark border">Nema zakazanih termina</span>
+                }
+                <a class="btn btn-outline-primary" asp-controller="Repertoar" asp-action="Index">Nazad na repertoar</a>
+            </div>
+
+            <div class="predstava-next mt-3">
+                <div class="predstava-next-label">Najblizi termin</div>
+                @if (nextTerm != null)
+                {
+                    <div class="predstava-next-info">
+                        <div>
+                            <div class="text-muted small">Datum</div>
+                            <div class="fw-semibold">@nextTerm.DatumVreme.ToString("dd.MM.yyyy")</div>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Vreme</div>
+                            <div class="fw-semibold">@nextTerm.DatumVreme.ToString("HH:mm")</div>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Sala</div>
+                            <div class="fw-semibold">@nextTerm.Sala</div>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Slobodno</div>
+                            <div class="fw-semibold">@nextTerm.Slobodno / @nextTerm.Kapacitet</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted small">Trenutno nema zakazanih termina za ovu predstavu.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 m-0">Termini</h2>
+    <div class="text-muted small">Ukupno: @(Model.Termini?.Count ?? 0)</div>
+</div>
+
+@if (Model.Termini == null || !Model.Termini.Any())
+{
+    <div class="alert alert-info">Trenutno nema zakazanih termina za ovu predstavu.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var t in Model.Termini)
+        {
+            var isSoldOut = t.Slobodno <= 0;
+            var occupancy = t.Kapacitet > 0
+                ? (int)Math.Round((1 - (double)t.Slobodno / t.Kapacitet) * 100)
+                : 0;
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card p-3 h-100 predstava-term-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="fw-semibold">@t.DatumVreme.ToString("dd.MM.yyyy")</div>
+                            <div class="text-muted small">@t.DatumVreme.ToString("HH:mm")</div>
+                        </div>
+                        <span class="badge bg-light text-dark border">@t.Sala</span>
+                    </div>
+
+                    <div class="text-muted small">Slobodno: @t.Slobodno / @t.Kapacitet</div>
+                    <div class="repertoar-progress mt-2" aria-hidden="true">
+                        <div class="repertoar-progress-bar" style="width:@occupancy%"></div>
+                    </div>
+
+                    @if (isSoldOut)
+                    {
+                        <span class="badge bg-secondary">Rasprodato</span>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-primary"
+                           asp-controller="Rezervacija"
+                           asp-action="Create"
+                           asp-route-terminId="@t.TerminId">
+                            Rezervisi
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

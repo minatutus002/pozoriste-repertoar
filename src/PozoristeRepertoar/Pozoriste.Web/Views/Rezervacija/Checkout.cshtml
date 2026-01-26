@@ -1,0 +1,176 @@
+@model Pozoriste.Web.Models.RezervacijaCheckoutVM
+@using Pozoriste.Models.Entities
+
+@{
+    ViewData["Title"] = "Potvrda rezervacije";
+
+    var statusClass = Model.Status switch
+    {
+        RezervacijaStatus.Placeno => "bg-success",
+        RezervacijaStatus.Otkazano => "bg-secondary",
+        RezervacijaStatus.OtkazivanjeNaCekanju => "bg-info text-dark",
+        RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno => "bg-info text-dark",
+        RezervacijaStatus.Refundiran => "bg-primary",
+        _ => "bg-warning text-dark"
+    };
+
+    var statusLabel = Model.Status switch
+    {
+        RezervacijaStatus.Rezervisano => "Rezervisano",
+        RezervacijaStatus.Placeno => "Placeno",
+        RezervacijaStatus.Otkazano => "Otkazano",
+        RezervacijaStatus.OtkazivanjeNaCekanju => "Ceka otkazivanje",
+        RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno => "Ceka refundaciju",
+        RezervacijaStatus.Refundiran => "Refundiran",
+        _ => Model.Status.ToString()
+    };
+}
+
+<div class="flow-steps mb-3">
+    <div class="flow-step is-done">
+        <span>1</span>
+        <div>Termin</div>
+    </div>
+    <div class="flow-step is-done">
+        <span>2</span>
+        <div>Sedista</div>
+    </div>
+    <div class="flow-step is-active">
+        <span>3</span>
+        <div>Potvrda</div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-8">
+        <div class="card p-3 p-md-4 reservation-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <div class="text-muted text-uppercase small fw-semibold">Korak 3</div>
+                    <h1 class="h4 mb-1">Potvrda rezervacije</h1>
+                    <div class="text-muted small">Pregled rezervacije i korak za placanje.</div>
+                </div>
+                <span class="badge @statusClass">@statusLabel</span>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-12 col-md-6">
+                    <div class="text-muted small">Predstava</div>
+                    <div class="fw-semibold">@Model.Predstava</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="text-muted small">Sala</div>
+                    <div class="fw-semibold">@Model.Sala</div>
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                    <div class="text-muted small">Datum</div>
+                    <div class="fw-semibold">@Model.DatumVreme.ToString("dd.MM.yyyy")</div>
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                    <div class="text-muted small">Vreme</div>
+                    <div class="fw-semibold">@Model.DatumVreme.ToString("HH:mm")</div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="text-muted small">Broj karata</div>
+                    <div class="fw-semibold">@Model.BrojKarata</div>
+                </div>
+                <div class="col-6">
+                    <div class="text-muted small">Cena po karti</div>
+                    <div class="fw-semibold">@Model.Cena.ToString("0.00") RSD</div>
+                </div>
+                <div class="col-12 mt-2">
+                    <div class="text-muted small">Sedista</div>
+                    <div class="fw-semibold">@Model.Sedista</div>
+                </div>
+                <div class="col-12 mt-2">
+                    <div class="text-muted small">Ukupno</div>
+                    <div class="fw-semibold">@Model.Ukupno.ToString("0.00") RSD</div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a class="btn btn-outline-secondary" asp-action="Index">Nazad na moje rezervacije</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card p-3 p-md-4 reservation-summary">
+            <h2 class="h6 text-uppercase text-muted">Placanje</h2>
+            <div class="summary-list mt-3">
+                <div class="summary-row">
+                    <span class="text-muted">Broj karata</span>
+                    <span>@Model.BrojKarata</span>
+                </div>
+                <div class="summary-row">
+                    <span class="text-muted">Cena po karti</span>
+                    <span>@Model.Cena.ToString("0.00") RSD</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Ukupno</span>
+                    <span>@Model.Ukupno.ToString("0.00") RSD</span>
+                </div>
+            </div>
+
+            <div class="text-muted small mt-3">
+                Placanje je simulirano. Dugme menja status rezervacije.
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                @if (Model.Status == RezervacijaStatus.Rezervisano)
+                {
+                    <form asp-action="Pay" method="post" class="w-100">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.RezervacijaId" />
+                        <button type="submit" class="btn btn-primary w-100">Plati</button>
+                    </form>
+                    <form asp-action="RequestCancel" method="post" class="w-100">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.RezervacijaId" />
+                        <button type="submit"
+                                class="btn btn-outline-danger w-100"
+                                onclick="return confirm('Poslati zahtev za otkazivanje?');">
+                            Zatrazi otkazivanje
+                        </button>
+                    </form>
+                }
+                else if (Model.Status == RezervacijaStatus.Placeno)
+                {
+                    <form asp-action="RequestCancel" method="post" class="w-100">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.RezervacijaId" />
+                        <button type="submit"
+                                class="btn btn-outline-danger w-100"
+                                onclick="return confirm('Poslati zahtev za povrat novca?');">
+                            Zatrazi otkazivanje
+                        </button>
+                    </form>
+                }
+                else if (Model.Status == RezervacijaStatus.OtkazivanjeNaCekanju ||
+                         Model.Status == RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno)
+                {
+                    <div class="alert alert-info w-100 mb-0">
+                        Zahtev za otkazivanje je poslat i ceka odobrenje admina.
+                    </div>
+                }
+                else if (Model.Status == RezervacijaStatus.Refundiran)
+                {
+                    <div class="alert alert-success w-100 mb-0">
+                        Povrat novca je odobren.
+                    </div>
+                }
+                else if (Model.Status == RezervacijaStatus.Otkazano)
+                {
+                    <div class="alert alert-secondary w-100 mb-0">
+                        Rezervacija je otkazana.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
