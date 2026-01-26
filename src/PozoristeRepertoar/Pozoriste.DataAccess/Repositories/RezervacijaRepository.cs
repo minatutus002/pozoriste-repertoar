@@ -30,6 +30,8 @@ namespace Pozoriste.DataAccess.Repositories
         public async Task<List<Rezervacija>> GetByUserAsync(string userId)
         {
             return await _db.Rezervacije
+                .AsNoTracking()
+                .AsSplitQuery()
                 .Include(x => x.Termin)
                     .ThenInclude(t => t.Predstava)
                 .Include(x => x.Termin)

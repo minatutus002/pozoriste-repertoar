@@ -18,13 +18,16 @@ namespace Pozoriste.DataAccess.Repositories
         public async Task<List<Predstava>> GetAllAsync()
         {
             return await _db.Predstave
+                .AsNoTracking()
                 .Include(p => p.Zanr)
+                .OrderBy(p => p.Naziv)
                 .ToListAsync();
         }
 
         public async Task<Predstava?> GetByIdAsync(int id)
         {
             return await _db.Predstave
+                .AsNoTracking()
                 .Include(p => p.Zanr)
                 .FirstOrDefaultAsync(p => p.PredstavaId == id);
         }

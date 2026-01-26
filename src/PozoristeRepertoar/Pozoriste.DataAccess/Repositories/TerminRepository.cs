@@ -17,16 +17,20 @@ namespace Pozoriste.DataAccess.Repositories
         public async Task<List<Termin>> GetAllAsync()
         {
             return await _context.Termini
+                .AsNoTracking()
                 .Include(t => t.Predstava)
                 .Include(t => t.Sala)
+                .OrderBy(t => t.DatumVreme)
                 .ToListAsync();
         }
         public async Task<List<Termin>> GetAllWithDetailsAsync()
         {
             return await _context.Termini
+                .AsNoTracking()
                 .Include(t => t.Predstava)
                     .ThenInclude(p => p.Zanr)
                 .Include(t => t.Sala)
+                .OrderBy(t => t.DatumVreme)
                 .ToListAsync();
         }
         public async Task CreateAsync(int predstavaId, int salaId, DateTime datumVreme)
@@ -68,6 +72,7 @@ namespace Pozoriste.DataAccess.Repositories
         public async Task<Termin?> GetByIdWithDetailsAsync(int id)
         {
             return await _context.Termini
+                .AsNoTracking()
                 .Include(t => t.Predstava)
                 .Include(t => t.Sala)
                 .FirstOrDefaultAsync(t => t.TerminId == id);

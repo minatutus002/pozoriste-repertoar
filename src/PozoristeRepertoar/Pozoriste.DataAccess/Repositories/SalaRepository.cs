@@ -16,6 +16,7 @@ namespace Pozoriste.DataAccess.Repositories
         public Task<List<Sala>> GetAllAsync()
         {
             return _db.Sale
+                .AsNoTracking()
                 .OrderBy(s => s.Naziv)
                 .ToListAsync();
         }
