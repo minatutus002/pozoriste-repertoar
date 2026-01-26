@@ -1,0 +1,23 @@
+﻿@model List<Pozoriste.Models.Entities.Termin>
+
+<h2>Termini</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Predstava</th>
+            <th>Sala</th>
+            <th>Datum i vreme</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.Predstava.Naziv</td>
+                <td>@t.Sala.Naziv</td>
+                <td>@t.DatumVreme.ToString("dd.MM.yyyy HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>
