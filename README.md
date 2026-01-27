@@ -1,75 +1,133 @@
-# Pozoriöte ó Repertoar (pozoriste-repertoar)
+# Pozori≈°te ‚Äî Repertoar
 
-Kratak opis
------------
-ASP.NET Core MVC aplikacija za upravljanje repertoarom pozoriöta, rezervacijama i administracijom predstava.
+ASP.NET Core MVC web aplikacija za upravljanje repertoarom pozori≈°ta.  
+Aplikacija sadr≈æi korisniƒçki deo za pregled predstava i administrativni deo za upravljanje sadr≈æajem.
 
-Brzo pokretanje (lokalno)
---------------------------
-1. Preduvjeti:
-   - .NET 7 (ili verzija koju projekat koristi)
-   - SQL Server (lokalno ili kroz Docker)
-   - (opciono) Docker & docker-compose za brz lokalni razvoj
+---
 
-2. Konfiguracija:
-   - Napravi lokalni fajl za konfiguraciju ili postavi Environment varijable.
-     Primjeri (Linux/macOS):
-     ```
-     export ConnectionStrings__DefaultConnection="Server=localhost;Database=PozoristeRepertoar;User Id=sa;Password=YourStrong!Passw0rd"
-     export POZ_ADMIN_PASSWORD="Admin123!"
-     ```
-   - Alternativno kopiraj `appsettings.Development.json.example` u `appsettings.Development.json` i popuni vrednosti (NE kommituj taj fajl).
+## Tehnologije
 
-3. Migracije + Seed:
-   - Pokreni migracije:
-     ```
-     dotnet ef database update --project src/PozoristeRepertoar/Pozoriste.DataAccess --startup-project src/PozoristeRepertoar/Pozoriste.Web
-     ```
-   - (Ako seed logika postoji u Program.cs, aplikacija moûe automatski seed-ovati admin nalog pri prvom pokretanju.)
+- ASP.NET Core MVC (.NET 8)
+- Entity Framework Core (Code First + migracije)
+- SQL Server
+- ASP.NET Identity
+- Razor Views
 
-4. Pokretanje aplikacije:
-   ```
-   cd src/PozoristeRepertoar/Pozoriste.Web
-   dotnet run
-   ```
-   Aplikacija Êe biti dostupna na `https://localhost:5001` (ili port koji je konfigurisan).
+---
 
-Tajni podaci i lozinke
-----------------------
-NE hardkodovati lozinke (npr. admin lozinka) u kodu. KoriöÊenje:
-- Environment varijabli
-- User Secrets (lokalno): `dotnet user-secrets`
-- Tajni menadûeri (Azure Key Vault, AWS Secrets Manager) za produkciju
+## Funkcionalnosti
 
-Git higijena i preporuke
-------------------------
-- Dodan je `.gitignore` za .NET i tipiËne artefakte.
-- PreporuËuje se da se vendor paketi (wwwroot/lib) NE Ëuvaju u repou ó koristi LibMan/CDN/nuget/npm.
-- PreporuËuje se da se veliki fajlovi uklone iz istorije ako su veÊ commit-ovani (BFG / git filter-repo).
+### Korisniƒçki deo
+- Pregled repertoara predstava
+- Prikaz detalja o predstavi
+- Pregled termina igranja
 
-CI / Testovi
-------------
-- U repou je predloûen GitHub Actions workflow (`.github/workflows/ci.yml`) koji:
-  - radi restore, build i test (kad su testovi dostupni)
-  - keöira NuGet pakete
+### Administratorski deo
+- Dodavanje, izmena i brisanje predstava
+- Upload slika za predstave
+- Upravljanje terminima
+- Role-based autorizacija (Admin)
 
-Doprinos i pravila za commit poruke
------------------------------------
-- Koristi jasne commit poruke. Primeri:
-  - feat: dodaj funkcionalnost rezervacije
-  - fix: popravi NullReference u TerminRepository
-  - chore: formatiranje koda i dodavanje .editorconfig
-- Branching:
-  - feature/* za nove funkcionalnosti
-  - fix/* za ispravke greöaka
-  - chore/* za dev ops i konfig izmene
-- Otvaraj Pull Request-ove i traûi review pre merge-a.
+---
 
-Kako ukloniti velike fajlove iz istorije (ako treba)
----------------------------------------------------
-- Ako su veliki vendor fajlovi veÊ committovani i treba ih izbrisati iz istorije:
-  - Upotrebi BFG ili git filter-repo (ovo menja istoriju i zahteva force push i koordinaciju sa timom).
+## Pokretanje aplikacije (lokalno)
 
-Kontakt
--------
-Za pitanja ostavi issue u repozitorijumu ili kontaktiraj autora putem GitHub profila.
+### Preduslovi
+
+- Visual Studio 2022
+- .NET 8 SDK
+- SQL Server (LocalDB ili lokalna instanca)
+
+---
+
+### Konfiguracija baze podataka
+
+1. U root folderu projekta pronaƒëi fajl:
+
+appsettings.Development.json.example
+
+2. Napravi kopiju i preimenuj fajl u:
+
+appsettings.Development.json
+
+3. U tom fajlu podesi connection string:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=.;Database=PozoristeRepertoar;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+```
+
+NAPOMENA: Ovaj fajl se ne commit-uje u Git repozitorijum jer sadr≈æi lokalne konfiguracije.
+
+---
+
+### Migracije baze
+
+U Package Manager Console ili terminalu pokreni:
+
+```bash
+dotnet ef database update
+```
+
+Ova komanda automatski kreira bazu podataka i tabele.
+
+---
+
+### Pokretanje aplikacije
+
+U Visual Studio okru≈æenju:
+
+- Pokreni aplikaciju klikom na Run (F5)
+
+ILI preko terminala:
+
+```bash
+dotnet run
+```
+
+Aplikacija ƒáe biti dostupna na adresi:
+
+https://localhost:5001
+
+(Port mo≈æe da se razlikuje u zavisnosti od lokalne konfiguracije)
+
+---
+
+## Seed podaci
+
+Prilikom prvog pokretanja aplikacije automatski se kreiraju osnovne role i administratorski nalog (ukoliko veƒá ne postoje).
+
+Administratorski podaci se ne hardkoduju u kodu veƒá se ƒçitaju iz konfiguracije ili environment varijabli.
+
+---
+
+## Bezbednost
+
+- Lozinke i connection string podaci nisu hardkodovani u aplikaciji
+- Osetljivi podaci se ƒçuvaju u lokalnim konfiguracionim fajlovima ili environment varijablama
+- Implementirana je osnovna validacija prilikom uploada fajlova
+
+---
+
+## Struktura projekta
+
+PozoristeRepertoar  
+‚îÇ  
+‚îú‚îÄ‚îÄ Pozoriste.Web          -> UI sloj (Controllers, Views, Identity, Areas)  
+‚îú‚îÄ‚îÄ Pozoriste.DataAccess   -> EF Core, DbContext, Repositories, Migracije  
+‚îú‚îÄ‚îÄ Pozoriste.Models       -> Entity modeli i ViewModel-i  
+
+---
+
+## Git higijena
+
+- Build fajlovi (bin, obj, .vs) nisu verzionisani
+- .gitignore je konfigurisan za .NET projekte
+- GitHub Actions CI workflow automatski proverava build aplikacije
+
+---
+
+## Autor
+
+Projekat je razvijen kao studentski rad u okviru kursa iz oblasti softverskog in≈æenjerstva.
