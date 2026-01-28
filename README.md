@@ -72,20 +72,20 @@ appsettings.Development.json
 "ConnectionStrings": {
   "DefaultConnection": "Server=.;Database=PozoristeRepertoar;Trusted_Connection=True;TrustServerCertificate=True;"
 }
+```
 
-
-###⚠️ Napomena: Ovaj fajl se ne commit-uje u Git repozitorijum jer sadrži lokalne konfiguracije.
-
-
+> ⚠️ Napomena: appsettings.Development.json fajl se NE commit-uje u repozitorijum jer sadrži lokalne konfiguracije.
 
 ###🔄 Migracije baze
 
 U Package Manager Console ili terminalu pokreni:
 
+```bash
 dotnet ef database update
+```
 
+Ova komanda automatski kreira bazu i tabele.
 
-Ova komanda automatski kreira bazu podataka i tabele.
 
 ###▶️ Pokretanje aplikacije
 
