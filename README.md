@@ -1,3 +1,4 @@
+```md
 <div align="center">
 
 # 🎭 Pozorište — Repertoar 💗  
@@ -27,6 +28,7 @@
 ---
 
 ## 👩‍💻 Tim
+
 Girl Dev Team 💅✨  
 Zajedno gradimo stabilne, čiste i profesionalne aplikacije sa stilom 💗  
 
@@ -60,11 +62,19 @@ Zajedno gradimo stabilne, čiste i profesionalne aplikacije sa stilom 💗
 
 1. U root folderu projekta pronađi fajl:
 
+```
+
 appsettings.Development.json.example
+
+```
 
 2. Napravi kopiju i preimenuj fajl u:
 
+```
+
 appsettings.Development.json
+
+````
 
 3. U tom fajlu podesi connection string:
 
@@ -72,11 +82,14 @@ appsettings.Development.json
 "ConnectionStrings": {
   "DefaultConnection": "Server=.;Database=PozoristeRepertoar;Trusted_Connection=True;TrustServerCertificate=True;"
 }
-```
+````
 
-> ⚠️ Napomena: appsettings.Development.json fajl se NE commit-uje u repozitorijum jer sadrži lokalne konfiguracije.
+> ⚠️ **Napomena:**
+> appsettings.Development.json fajl se NE commit-uje u repozitorijum jer sadrži lokalne konfiguracije.
 
-##🔄 Migracije baze
+---
+
+## 🔄 Migracije baze
 
 U Package Manager Console ili terminalu pokreni:
 
@@ -86,53 +99,70 @@ dotnet ef database update
 
 Ova komanda automatski kreira bazu i tabele.
 
+---
 
-##▶️ Pokretanje aplikacije
+## ▶️ Pokretanje aplikacije
 
 U Visual Studio okruženju:
 
-Pokreni aplikaciju klikom na Run (F5)
+* Pokreni aplikaciju klikom na **Run (F5)**
 
 ILI preko terminala:
 
+```bash
 dotnet run
-
+```
 
 Aplikacija će biti dostupna na adresi:
 
+```
 https://localhost:5001
+```
 
 (Port može da se razlikuje u zavisnosti od lokalne konfiguracije)
 
-##🌱 Seed podaci
+---
+
+## 🌱 Seed podaci
+
 Prilikom prvog pokretanja aplikacije automatski se kreiraju osnovne role i administratorski nalog (ukoliko već ne postoje).
 
 Administratorski podaci se ne hardkoduju u kodu već se čitaju iz konfiguracije ili environment varijabli.
 
-##🔐 Bezbednost
-Lozinke i connection string podaci nisu hardkodovani
+---
 
-Osetljivi podaci se čuvaju u lokalnim konfiguracionim fajlovima ili environment varijablama
+## 🔐 Bezbednost
 
-Implementirana je osnovna validacija prilikom uploada fajlova
+* Lozinke i connection string podaci nisu hardkodovani
+* Osetljivi podaci se čuvaju u lokalnim konfiguracionim fajlovima ili environment varijablama
+* Implementirana je osnovna validacija prilikom uploada fajlova
 
-##🗂️ Struktura projekta
+---
+
+## 🗂️ Struktura projekta
+
+```
 PozoristeRepertoar
 │
 ├── Pozoriste.Web          -> UI sloj (Controllers, Views, Identity, Areas)
 ├── Pozoriste.DataAccess   -> EF Core, DbContext, Repositories, Migracije
 ├── Pozoriste.Models       -> Entity modeli i ViewModel-i
+```
 
-##🧼 Git higijena
+---
 
-Build fajlovi (bin, obj, .vs) nisu verzionisani
+## 🧼 Git higijena
 
-.gitignore je konfigurisan za .NET projekte
+* Build fajlovi (`bin`, `obj`, `.vs`) nisu verzionisani
+* `.gitignore` je konfigurisan za .NET projekte
+* GitHub Actions CI workflow automatski proverava build aplikacije
 
-GitHub Actions CI workflow automatski proverava build aplikacije
+---
 
-##🎓 Autor
+## 🎓 Autor
+
 Projekat je razvijen kao studentski rad u okviru kursa iz oblasti softverskog inženjerstva. 💗👩‍💻
+Girl Dev Team ✨
 
-
-
+```
+```
