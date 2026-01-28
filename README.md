@@ -46,17 +46,18 @@ Zajedno gradimo stabilne, čiste i profesionalne aplikacije sa stilom 💗
 
 ## 🖼️ Izgled aplikacije
 
-### 🎟️ Početna stranica
-![Početna stranica](screenshots/Snimak%20ekrana%202026-01-28%20233155.png)
+### 🎟️ Početna stranica — korisnički deo
 
-### 🛠️ Admin panel
-![Admin panel](screenshots/Snimak%20ekrana%202026-01-28%20233148.png)
+![Početna 1](screenshots/Snimak%20ekrana%202026-01-28%20233127.png)
+![Početna 2](screenshots/Snimak%20ekrana%202026-01-28%20233137.png)
+![Početna 3](screenshots/Snimak%20ekrana%202026-01-28%20233148.png)
+![Početna 4](screenshots/Snimak%20ekrana%202026-01-28%20233155.png)
 
-### 📅 Repertoar
-![Repertoar](screenshots/Snimak%20ekrana%202026-01-28%20233137.png)
+---
 
-### 📊 Dashboard
-![Dashboard](screenshots/Snimak%20ekrana%202026-01-28%20233127.png)
+### 🛠️ Administratorski panel (Dashboard)
+
+![Admin dashboard](screenshots/Snimak%20ekrana%202026-01-28%20231634.png)
 
 
 ### 🎟️ Korisnički deo
