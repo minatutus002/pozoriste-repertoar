@@ -626,6 +626,26 @@ h1, h2, h3, h4, h5 {
     border-color: #fecaca;
 }
 
+.seat-swatch.zone-vip {
+    background: rgba(122,30,43,0.45);
+    border-color: rgba(122,30,43,0.45);
+}
+
+.seat-swatch.zone-standard {
+    background: rgba(99,102,241,0.45);
+    border-color: rgba(99,102,241,0.45);
+}
+
+.seat-swatch.zone-balkon {
+    background: rgba(14,116,144,0.45);
+    border-color: rgba(14,116,144,0.45);
+}
+
+.seat-swatch.zone-intimna {
+    background: rgba(251,113,133,0.45);
+    border-color: rgba(251,113,133,0.45);
+}
+
 @media (min-width: 992px) {
     .reservation-summary {
         position: sticky;
@@ -1249,4 +1269,132 @@ h1, h2, h3, h4, h5 {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: inherit;
+}
+
+/* =========================
+   SALE + ZONE
+   ========================= */
+
+.sala-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.sala-card {
+    border-radius: 18px;
+}
+
+.sala-zone-list {
+    display: grid;
+    gap: 10px;
+}
+
+.sala-zone-chip {
+    border-radius: 14px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: #fff;
+}
+
+.sala-zone-title {
+    font-weight: 800;
+}
+
+.sala-zone-rows {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    opacity: .75;
+}
+
+.sala-zone-desc {
+    font-size: 13px;
+    opacity: .75;
+}
+
+.zone-vip {
+    background: linear-gradient(135deg, rgba(122,30,43,0.18), rgba(155,46,59,0.15));
+    border-color: rgba(122,30,43,0.35);
+}
+
+.zone-premium {
+    background: linear-gradient(135deg, rgba(198,155,58,0.2), rgba(252,211,77,0.18));
+    border-color: rgba(198,155,58,0.4);
+}
+
+.zone-standard {
+    background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(129,140,248,0.15));
+    border-color: rgba(99,102,241,0.35);
+}
+
+.zone-balkon {
+    background: linear-gradient(135deg, rgba(14,116,144,0.2), rgba(6,182,212,0.18));
+    border-color: rgba(14,116,144,0.35);
+}
+
+.zone-intimna {
+    background: linear-gradient(135deg, rgba(251,113,133,0.2), rgba(244,114,182,0.18));
+    border-color: rgba(251,113,133,0.35);
+}
+
+/* =========================
+   SEATING ZONES
+   ========================= */
+
+.seat-row.zone-row {
+    border-radius: 12px;
+    padding: 6px 8px;
+}
+
+.seat-row.zone-row .seat-label {
+    font-weight: 800;
+}
+
+.seat-row.zone-vip {
+    background: rgba(122,30,43,0.08);
+}
+
+.seat-row.zone-standard {
+    background: rgba(99,102,241,0.08);
+}
+
+.seat-row.zone-premium {
+    background: rgba(198,155,58,0.08);
+}
+
+.seat-row.zone-balkon {
+    background: rgba(14,116,144,0.08);
+}
+
+.seat-row.zone-intimna {
+    background: rgba(251,113,133,0.08);
+}
+
+.seat-zone-tag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 8px;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: #fff;
+}
+
+.seat-zone-tag.zone-vip { background: rgba(122,30,43,0.15); }
+.seat-zone-tag.zone-standard { background: rgba(99,102,241,0.15); }
+.seat-zone-tag.zone-premium { background: rgba(198,155,58,0.18); }
+.seat-zone-tag.zone-balkon { background: rgba(14,116,144,0.15); }
+.seat-zone-tag.zone-intimna { background: rgba(251,113,133,0.15); }
+
+/* =========================
+   NAVBAR BUTTON VISIBILITY
+   ========================= */
+
+.navbar .btn-outline-danger,
+.navbar .btn-outline-light {
+    opacity: 1;
+    border-width: 2px;
 }

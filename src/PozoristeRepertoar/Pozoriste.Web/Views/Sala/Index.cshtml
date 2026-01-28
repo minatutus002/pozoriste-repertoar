@@ -1,36 +1,51 @@
-﻿@model IEnumerable<Pozoriste.Models.Entities.Sala>
+@model IEnumerable<Pozoriste.Web.Models.SalaIndexVm>
 
 @{
     ViewData["Title"] = "Sale";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="m-0">Sale</h1>
+    <div>
+        <h1 class="m-0">Sale</h1>
+        <div class="text-muted">Razlicite zone karata jasno istaknute da bi svaki gost znao gde sedi.</div>
+    </div>
 </div>
 
-<div class="row g-3">
+<div class="sala-grid">
     @foreach (var s in Model)
     {
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h5 class="card-title">@s.Naziv</h5>
-
-                    <div class="text-muted small">ID: @s.SalaId</div>
-                    <div class="text-muted small">
-                        Redovi: @s.BrojRedova &middot; Sedista po redu: @s.SedistaPoRedu &middot; Kapacitet: @s.Kapacitet
+        <article class="card sala-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h3 class="h5 mb-1">@s.Naziv</h3>
+                        <div class="text-muted small">
+                            Redovi: @s.BrojRedova &middot; Sedista po redu: @s.SedistaPoRedu &middot; Kapacitet: @s.Kapacitet
+                        </div>
                     </div>
+                    <span class="badge text-bg-light border">Sala #@s.SalaId</span>
+                </div>
 
-                    <div class="mt-3">
-                        <a class="btn btn-outline-primary btn-sm"
-                           asp-controller="Repertoar"
-                           asp-action="Index"
-                           asp-route-salaId="@s.SalaId">
-                            Rezervisi termin
-                        </a>
-                    </div>
+                <div class="sala-zone-list mt-3">
+                    @foreach (var z in s.Zone)
+                    {
+                        <div class="sala-zone-chip @z.CssClass">
+                            <div class="sala-zone-title">@z.Naziv</div>
+                            <div class="sala-zone-rows">@z.Redovi</div>
+                            <div class="sala-zone-desc">@z.Opis</div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-3">
+                    <a class="btn btn-outline-primary btn-sm"
+                       asp-controller="Repertoar"
+                       asp-action="Index"
+                       asp-route-salaId="@s.SalaId">
+                        Pogledaj termine
+                    </a>
                 </div>
             </div>
-        </div>
+        </article>
     }
 </div>
