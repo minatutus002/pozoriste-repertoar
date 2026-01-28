@@ -36,22 +36,22 @@
                     @switch (r.Status)
                     {
                         case RezervacijaStatus.Rezervisano:
-                            <span class="badge bg-warning text-dark">Rezervisano</span>
+                            <span class="badge bg-warning text-dark">🟡 Rezervisano</span>
                             break;
                         case RezervacijaStatus.Placeno:
-                            <span class="badge bg-success">Placeno</span>
+                            <span class="badge bg-success">🟢 Placeno</span>
                             break;
                         case RezervacijaStatus.Otkazano:
-                            <span class="badge bg-secondary">Otkazano</span>
+                            <span class="badge bg-secondary">⚪ Otkazano</span>
                             break;
                         case RezervacijaStatus.OtkazivanjeNaCekanju:
-                            <span class="badge bg-info text-dark">Ceka otkazivanje</span>
+                            <span class="badge bg-info text-dark">🔵 Ceka otkaz</span>
                             break;
                         case RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno:
-                            <span class="badge bg-info text-dark">Ceka otkaz (placeno)</span>
+                            <span class="badge bg-info text-dark">💳 Ceka otkaz (placeno)</span>
                             break;
                         case RezervacijaStatus.Refundiran:
-                            <span class="badge bg-primary">Refundiran</span>
+                            <span class="badge bg-primary">💸 Refundiran</span>
                             break;
                     }
                 </td>
@@ -82,6 +82,18 @@
                             <button class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Odbiti zahtev za otkazivanje?');">
                                 Odbij
+                            </button>
+                        </form>
+                    }
+                    @if (r.Status == RezervacijaStatus.Otkazano ||
+                         r.Status == RezervacijaStatus.Refundiran)
+                    {
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="DeleteCanceled" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@r.RezervacijaId" />
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Obrisati otkazanu/refundiranu rezervaciju?');">
+                                🗑️ Obrisi
                             </button>
                         </form>
                     }

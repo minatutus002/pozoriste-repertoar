@@ -50,9 +50,14 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
                 return View(model);
             }
 
-            if (await HasOverlapAsync(model, predstava!.TrajanjeMin))
+            var start = model.DatumVreme;
+            var end = start.AddMinutes(predstava!.TrajanjeMin);
+            var overlap = await GetOverlapAsync(model.SalaId, start, end, model.TerminId);
+            if (overlap != null)
             {
-                ModelState.AddModelError(nameof(Termin.DatumVreme), "Termin se preklapa sa postojecim terminom u istoj sali.");
+                var naziv = overlap.Predstava?.Naziv ?? "nepoznata predstava";
+                var vreme = overlap.DatumVreme.ToString("dd.MM.yyyy HH:mm");
+                ModelState.AddModelError(nameof(Termin.DatumVreme), $"Termin se preklapa sa \"{naziv}\" ({vreme}).");
                 await FillDropdowns();
                 return View(model);
             }
@@ -88,9 +93,14 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
                 return View(model);
             }
 
-            if (await HasOverlapAsync(model, predstava!.TrajanjeMin))
+            var start = model.DatumVreme;
+            var end = start.AddMinutes(predstava!.TrajanjeMin);
+            var overlap = await GetOverlapAsync(model.SalaId, start, end, model.TerminId);
+            if (overlap != null)
             {
-                ModelState.AddModelError(nameof(Termin.DatumVreme), "Termin se preklapa sa postojecim terminom u istoj sali.");
+                var naziv = overlap.Predstava?.Naziv ?? "nepoznata predstava";
+                var vreme = overlap.DatumVreme.ToString("dd.MM.yyyy HH:mm");
+                ModelState.AddModelError(nameof(Termin.DatumVreme), $"Termin se preklapa sa \"{naziv}\" ({vreme}).");
                 await FillDropdowns();
                 return View(model);
             }
@@ -120,18 +130,16 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
             ViewBag.Sale = new SelectList(sale, "SalaId", "Naziv");
         }
 
-        private async Task<bool> HasOverlapAsync(Termin model, int trajanjeMin)
+        private async Task<Termin?> GetOverlapAsync(int salaId, DateTime start, DateTime end, int? ignoreTerminId)
         {
             var existing = await _db.Termini
                 .AsNoTracking()
                 .Include(t => t.Predstava)
-                .Where(t => t.SalaId == model.SalaId && t.TerminId != model.TerminId)
+                .Where(t => t.SalaId == salaId && (!ignoreTerminId.HasValue || t.TerminId != ignoreTerminId.Value))
                 .ToListAsync();
 
-            var start = model.DatumVreme;
-            var end = start.AddMinutes(trajanjeMin);
-
-            return existing.Any(t =>
+            return existing.FirstOrDefault(t =>
+                t.Predstava != null &&
                 start < t.DatumVreme.AddMinutes(t.Predstava.TrajanjeMin) &&
                 end > t.DatumVreme);
         }
