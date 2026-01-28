@@ -11,6 +11,7 @@ namespace Pozoriste.DataAccess.Repositories
         Task UpdateAsync(int terminId, int predstavaId, int salaId, DateTime datumVreme);
         Task DeleteAsync(int id);
         Task<Termin?> GetByIdWithDetailsAsync(int id);
+        Task<Termin?> GetOverlapAsync(int salaId, DateTime start, DateTime end, int? ignoreTerminId = null);
 
     }
 }

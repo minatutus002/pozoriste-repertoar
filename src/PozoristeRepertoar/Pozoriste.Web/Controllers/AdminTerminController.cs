@@ -74,10 +74,14 @@ namespace Pozoriste.Web.Controllers
             }
 
             var datum = vm.DatumVreme.Value;
+            var end = datum.AddMinutes(predstava!.TrajanjeMin);
 
-            if (await HasOverlapAsync(vm.SalaId, datum, predstava!.TrajanjeMin))
+            var overlap = await _terminRepo.GetOverlapAsync(vm.SalaId, datum, end);
+            if (overlap != null)
             {
-                ModelState.AddModelError(nameof(vm.DatumVreme), "Termin se preklapa sa postojecim terminom u istoj sali.");
+                var naziv = overlap.Predstava?.Naziv ?? "nepoznata predstava";
+                var vreme = overlap.DatumVreme.ToString("dd.MM.yyyy HH:mm");
+                ModelState.AddModelError(nameof(vm.DatumVreme), $"Termin se preklapa sa \"{naziv}\" ({vreme}).");
                 await NapuniListe(vm);
                 return View(vm);
             }
@@ -142,10 +146,14 @@ namespace Pozoriste.Web.Controllers
             }
 
             var datum = vm.DatumVreme.Value;
+            var end = datum.AddMinutes(predstava!.TrajanjeMin);
 
-            if (await HasOverlapAsync(vm.SalaId, datum, predstava!.TrajanjeMin, id))
+            var overlap = await _terminRepo.GetOverlapAsync(vm.SalaId, datum, end, id);
+            if (overlap != null)
             {
-                ModelState.AddModelError(nameof(vm.DatumVreme), "Termin se preklapa sa postojecim terminom u istoj sali.");
+                var naziv = overlap.Predstava?.Naziv ?? "nepoznata predstava";
+                var vreme = overlap.DatumVreme.ToString("dd.MM.yyyy HH:mm");
+                ModelState.AddModelError(nameof(vm.DatumVreme), $"Termin se preklapa sa \"{naziv}\" ({vreme}).");
                 await NapuniListe(vm);
                 ViewBag.TerminId = id;
                 return View(vm);
@@ -186,20 +194,6 @@ namespace Pozoriste.Web.Controllers
                 })
                 .ToList();
         }
-
-        private async Task<bool> HasOverlapAsync(int salaId, DateTime start, int trajanjeMin, int? ignoreTerminId = null)
-        {
-            var termini = await _terminRepo.GetAllWithDetailsAsync();
-            var newEnd = start.AddMinutes(trajanjeMin);
-
-            return termini.Any(t =>
-                t.SalaId == salaId &&
-                (!ignoreTerminId.HasValue || t.TerminId != ignoreTerminId.Value) &&
-                start < t.DatumVreme.AddMinutes(t.Predstava.TrajanjeMin) &&
-                newEnd > t.DatumVreme);
-        }
-        
-       
 
     }
 
