@@ -29,13 +29,20 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
+        working-directory: src/PozoristeRepertoar
+
+
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore
+        working-directory: src/PozoristeRepertoar
+
 
       - name: Run tests
-        run: |
+        run: | 
           dotnet test --no-build --verbosity normal || true
+        working-directory: src/PozoristeRepertoar
+
 
       - name: Upload build artifacts (optional)
         if: always()
