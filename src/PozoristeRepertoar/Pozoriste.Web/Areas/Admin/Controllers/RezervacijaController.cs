@@ -122,6 +122,30 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCanceled(int id)
+        {
+            var rez = await _db.Rezervacije
+                .Include(r => r.Sedista)
+                .FirstOrDefaultAsync(r => r.RezervacijaId == id);
+            if (rez == null) return NotFound();
+
+            if (rez.Status != RezervacijaStatus.Otkazano &&
+                rez.Status != RezervacijaStatus.Refundiran)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (rez.Sedista.Count > 0)
+                _db.RezervacijaSedista.RemoveRange(rez.Sedista);
+
+            _db.Rezervacije.Remove(rez);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
         private static string GetRowLabel(int row)
         {
             if (row >= 1 && row <= 26)
