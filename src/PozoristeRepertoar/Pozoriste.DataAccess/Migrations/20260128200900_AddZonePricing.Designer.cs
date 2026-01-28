@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pozoriste.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using Pozoriste.DataAccess.Context;
 namespace Pozoriste.DataAccess.Migrations
 {
     [DbContext(typeof(PozoristeDbContext))]
-    partial class PozoristeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128200900_AddZonePricing")]
+    partial class AddZonePricing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,6 +84,9 @@ namespace Pozoriste.DataAccess.Migrations
                     b.Property<int>("TerminId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("UkupnaCena")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("RezervacijaId");
 
                     b.HasIndex("TerminId");
@@ -99,6 +105,9 @@ namespace Pozoriste.DataAccess.Migrations
                     b.Property<int>("Broj")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Cena")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("Red")
                         .HasColumnType("int");
 
@@ -108,11 +117,13 @@ namespace Pozoriste.DataAccess.Migrations
                     b.Property<int>("TerminId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Zona")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("RezervacijaSedisteId");
 
                     b.HasIndex("RezervacijaId");
-
-                    b.HasIndex("TerminId");
 
                     b.HasIndex("TerminId", "Red", "Broj")
                         .IsUnique();

@@ -79,10 +79,27 @@
                     <div class="text-muted small">Broj karata</div>
                     <div class="fw-semibold">@Model.BrojKarata</div>
                 </div>
-                <div class="col-6">
-                    <div class="text-muted small">Cena po karti</div>
-                    <div class="fw-semibold">@Model.Cena.ToString("0.00") RSD</div>
+                <div class="col-12">
+                    <div class="text-muted small">Cene (po zonama)</div>
+
+                    @if (Model.Stavke == null || Model.Stavke.Count == 0)
+                    {
+                        <div class="fw-semibold">-</div>
+                    }
+                    else
+                    {
+                        <div class="mt-1">
+                            @foreach (var s in Model.Stavke)
+                            {
+                                <div class="d-flex justify-content-between small">
+                                    <span>@s.Zona × @s.Kolicina (@s.CenaJed.ToString("0.00") RSD)</span>
+                                    <span class="fw-semibold">@s.Ukupno.ToString("0.00") RSD</span>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
+
                 <div class="col-12 mt-2">
                     <div class="text-muted small">Sedista</div>
                     <div class="fw-semibold">@Model.Sedista</div>
@@ -102,15 +119,35 @@
     <div class="col-12 col-lg-4">
         <div class="card p-3 p-md-4 reservation-summary">
             <h2 class="h6 text-uppercase text-muted">Placanje</h2>
+
             <div class="summary-list mt-3">
                 <div class="summary-row">
                     <span class="text-muted">Broj karata</span>
                     <span>@Model.BrojKarata</span>
                 </div>
-                <div class="summary-row">
-                    <span class="text-muted">Cena po karti</span>
-                    <span>@Model.Cena.ToString("0.00") RSD</span>
+
+                <div class="summary-row" style="flex-direction: column; align-items: stretch;">
+                    <span class="text-muted">Stavke</span>
+
+                    @if (Model.Stavke != null && Model.Stavke.Count > 0)
+                    {
+                        <div class="mt-2">
+                            @foreach (var s in Model.Stavke)
+                            {
+                                <div class="d-flex justify-content-between small">
+                                    <span>@s.Zona × @s.Kolicina</span>
+                                    <span>@s.Ukupno.ToString("0.00") RSD</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
                 </div>
+
+
                 <div class="summary-row summary-total">
                     <span>Ukupno</span>
                     <span>@Model.Ukupno.ToString("0.00") RSD</span>
@@ -129,6 +166,7 @@
                         <input type="hidden" name="id" value="@Model.RezervacijaId" />
                         <button type="submit" class="btn btn-primary w-100">Plati</button>
                     </form>
+
                     <form asp-action="RequestCancel" method="post" class="w-100">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.RezervacijaId" />
@@ -152,7 +190,7 @@
                     </form>
                 }
                 else if (Model.Status == RezervacijaStatus.OtkazivanjeNaCekanju ||
-                         Model.Status == RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno)
+                Model.Status == RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno)
                 {
                     <div class="alert alert-info w-100 mb-0">
                         Zahtev za otkazivanje je poslat i ceka odobrenje admina.
