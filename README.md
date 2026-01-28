@@ -42,6 +42,23 @@ Zajedno gradimo stabilne, čiste i profesionalne aplikacije sa stilom 💗
 
 ## ✨ Funkcionalnosti
 
+---
+
+## 🖼️ Izgled aplikacije
+
+### 🎟️ Početna stranica
+![Početna stranica](screenshots/Snimak%20ekrana%202026-01-28%20233155.png)
+
+### 🛠️ Admin panel
+![Admin panel](screenshots/Snimak%20ekrana%202026-01-28%20233148.png)
+
+### 📅 Repertoar
+![Repertoar](screenshots/Snimak%20ekrana%202026-01-28%20233137.png)
+
+### 📊 Dashboard
+![Dashboard](screenshots/Snimak%20ekrana%202026-01-28%20233127.png)
+
+
 ### 🎟️ Korisnički deo
 - Pregled repertoara predstava  
 - Prikaz detalja o predstavi  
