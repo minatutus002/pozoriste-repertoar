@@ -5,6 +5,7 @@
     var vm = Model!;
     var selectedCount = vm.Selected.Count;
     var ukupno = vm.Cena * selectedCount;
+    var zones = vm.Zone ?? new List<Pozoriste.Web.Models.SeatZoneVm>();
 }
 
 @functions {
@@ -14,6 +15,11 @@
             return ((char)('A' + row - 1)).ToString();
 
         return row.ToString();
+    }
+
+    private static Pozoriste.Web.Models.SeatZoneVm? ZoneForRow(int row, List<Pozoriste.Web.Models.SeatZoneVm> zones)
+    {
+        return zones.FirstOrDefault(z => row >= z.OdReda && row <= z.DoReda);
     }
 }
 
@@ -52,14 +58,22 @@
                 <div class="seat-grid">
                     @for (var row = 1; row <= vm.BrojRedova; row++)
                     {
-                        <div class="seat-row">
-                            <div class="seat-label">@RowLabel(row)</div>
+                        var zone = ZoneForRow(row, zones);
+                        var zoneClass = zone?.CssClass ?? "zone-standard";
+                        var zoneLabel = zone?.Naziv ?? "Standard";
+
+                        <div class="seat-row zone-row @zoneClass">
+                            <div class="seat-label">
+                                @RowLabel(row)
+                                <span class="seat-zone-tag @zoneClass">@zoneLabel</span>
+                            </div>
                             <div class="seat-items">
                                 @for (var seat = 1; seat <= vm.SedistaPoRedu; seat++)
                                 {
                                     var key = $"{row}-{seat}";
                                     var isTaken = vm.Zauzeta.Contains(key);
                                     var isSelected = vm.Selected.Contains(key);
+                                    var multiplier = zone?.CenaMultiplier ?? 1.0m;
 
                                     <label class="seat">
                                         @if (isTaken)
@@ -67,6 +81,8 @@
                                             <input type="checkbox"
                                                    class="seat-checkbox"
                                                    data-seat-label="@($"{RowLabel(row)}{seat}")"
+                                                   data-multiplier="@multiplier.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                                   data-zone="@zoneLabel"
                                                    name="Selected"
                                                    value="@key"
                                                    disabled />
@@ -76,6 +92,8 @@
                                             <input type="checkbox"
                                                    class="seat-checkbox"
                                                    data-seat-label="@($"{RowLabel(row)}{seat}")"
+                                                   data-multiplier="@multiplier.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                                   data-zone="@zoneLabel"
                                                    name="Selected"
                                                    value="@key"
                                                    checked />
@@ -85,6 +103,8 @@
                                             <input type="checkbox"
                                                    class="seat-checkbox"
                                                    data-seat-label="@($"{RowLabel(row)}{seat}")"
+                                                   data-multiplier="@multiplier.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                                   data-zone="@zoneLabel"
                                                    name="Selected"
                                                    value="@key" />
                                         }
@@ -100,6 +120,10 @@
                     <div><span class="seat-swatch seat-available"></span> Slobodno</div>
                     <div><span class="seat-swatch seat-selected"></span> Izabrano</div>
                     <div><span class="seat-swatch seat-taken"></span> Zauzeto</div>
+                    @foreach (var z in zones)
+                    {
+                        <div><span class="seat-swatch @z.CssClass"></span> @z.Naziv (@RowLabel(z.OdReda)-@RowLabel(z.DoReda))</div>
+                    }
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 mt-4">
@@ -133,10 +157,25 @@
                     <span class="text-muted">Cena</span>
                     <span>@vm.Cena.ToString("0.00") RSD</span>
                 </div>
+                @foreach (var z in zones)
+                {
+                    var zonaCena = (vm.Cena * z.CenaMultiplier).ToString("0.00");
+                    <div class="summary-row">
+                        <span class="text-muted">@z.Naziv cena</span>
+                        <span>@zonaCena RSD</span>
+                    </div>
+                }
                 <div class="summary-row">
                     <span class="text-muted">Izabrano</span>
                     <span data-seat-count>@selectedCount</span>
                 </div>
+                @foreach (var z in zones)
+                {
+                    <div class="summary-row">
+                        <span class="text-muted">@z.Naziv</span>
+                        <span data-zone-count="@z.Naziv">0</span>
+                    </div>
+                }
                 <div class="summary-row summary-total">
                     <span>Ukupno</span>
                     <span data-seat-total>@ukupno.ToString("0.00") RSD</span>

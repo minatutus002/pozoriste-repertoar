@@ -13,6 +13,8 @@ namespace Pozoriste.Web.Models
         public int BrojRedova { get; set; }
         public int SedistaPoRedu { get; set; }
 
+        public List<SeatZoneVm> Zone { get; set; } = new();
+
         public HashSet<string> Zauzeta { get; set; } = new();
         public List<string> Selected { get; set; } = new();
     }

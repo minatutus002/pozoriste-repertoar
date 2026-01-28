@@ -12,13 +12,34 @@ function updateSeatSummary() {
 
     const seats = Array.from(document.querySelectorAll(".seat-checkbox:checked"));
     const count = seats.length;
-    const total = Number.isFinite(price) ? price * count : 0;
+    let total = 0;
+    const zoneCounts = new Map();
+    const zoneCountEls = Array.from(summary.querySelectorAll("[data-zone-count]"));
+    zoneCountEls.forEach((el) => { el.textContent = "0"; });
 
     const countEl = summary.querySelector("[data-seat-count]");
     if (countEl) countEl.textContent = count.toString();
 
+    seats.forEach((seat) => {
+        const multiplierRaw = seat.getAttribute("data-multiplier") || "1";
+        const multiplier = parseFloat(multiplierRaw);
+        const zone = seat.getAttribute("data-zone") || "Standard";
+
+        const seatPrice = Number.isFinite(price) && Number.isFinite(multiplier)
+            ? price * multiplier
+            : 0;
+
+        total += seatPrice;
+        zoneCounts.set(zone, (zoneCounts.get(zone) || 0) + 1);
+    });
+
     const totalEl = summary.querySelector("[data-seat-total]");
     if (totalEl) totalEl.textContent = `${total.toFixed(2)} RSD`;
+
+    zoneCounts.forEach((value, key) => {
+        const zoneEl = summary.querySelector(`[data-zone-count="${key}"]`);
+        if (zoneEl) zoneEl.textContent = value.toString();
+    });
 
     const listEl = summary.querySelector("[data-seat-list]");
     if (!listEl) return;
