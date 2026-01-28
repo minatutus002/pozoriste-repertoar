@@ -4,6 +4,12 @@
 # 🎭 Pozorište — Repertoar 💗  
 ### 👩‍💻 Girl Dev Team • ASP.NET Core • SQL Server • MVC ✨  
 
+![.NET](https://img.shields.io/badge/.NET-8-purple)
+![SQL Server](https://img.shields.io/badge/Database-SQL%20Server-blue)
+![GitHub repo size](https://img.shields.io/github/repo-size/minatutus002/pozoriste-repertoar)
+![Last commit](https://img.shields.io/github/last-commit/minatutus002/pozoriste-repertoar)
+
+
 🌸 Moderna timska aplikacija za upravljanje repertoarom, predstavama, terminima i administracijom.  
 ✨ Fokus na čist kod, stabilan sistem i profesionalni dizajn.
 
