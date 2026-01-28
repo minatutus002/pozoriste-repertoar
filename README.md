@@ -76,7 +76,7 @@ appsettings.Development.json
 
 > ⚠️ Napomena: appsettings.Development.json fajl se NE commit-uje u repozitorijum jer sadrži lokalne konfiguracije.
 
-###🔄 Migracije baze
+##🔄 Migracije baze
 
 U Package Manager Console ili terminalu pokreni:
 
@@ -87,7 +87,7 @@ dotnet ef database update
 Ova komanda automatski kreira bazu i tabele.
 
 
-###▶️ Pokretanje aplikacije
+##▶️ Pokretanje aplikacije
 
 U Visual Studio okruženju:
 
@@ -104,26 +104,26 @@ https://localhost:5001
 
 (Port može da se razlikuje u zavisnosti od lokalne konfiguracije)
 
-###🌱 Seed podaci
+##🌱 Seed podaci
 Prilikom prvog pokretanja aplikacije automatski se kreiraju osnovne role i administratorski nalog (ukoliko već ne postoje).
 
 Administratorski podaci se ne hardkoduju u kodu već se čitaju iz konfiguracije ili environment varijabli.
 
-###🔐 Bezbednost
+##🔐 Bezbednost
 Lozinke i connection string podaci nisu hardkodovani
 
 Osetljivi podaci se čuvaju u lokalnim konfiguracionim fajlovima ili environment varijablama
 
 Implementirana je osnovna validacija prilikom uploada fajlova
 
-###🗂️ Struktura projekta
+##🗂️ Struktura projekta
 PozoristeRepertoar
 │
 ├── Pozoriste.Web          -> UI sloj (Controllers, Views, Identity, Areas)
 ├── Pozoriste.DataAccess   -> EF Core, DbContext, Repositories, Migracije
 ├── Pozoriste.Models       -> Entity modeli i ViewModel-i
 
-###🧼 Git higijena
+##🧼 Git higijena
 
 Build fajlovi (bin, obj, .vs) nisu verzionisani
 
@@ -131,7 +131,7 @@ Build fajlovi (bin, obj, .vs) nisu verzionisani
 
 GitHub Actions CI workflow automatski proverava build aplikacije
 
-###🎓 Autor
+##🎓 Autor
 Projekat je razvijen kao studentski rad u okviru kursa iz oblasti softverskog inženjerstva. 💗👩‍💻
 
 
