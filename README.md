@@ -48,10 +48,10 @@ Zajedno gradimo stabilne, čiste i profesionalne aplikacije sa stilom 💗
 
 ### 🎟️ Početna stranica — korisnički deo
 
-![Početna 1](screenshots/Snimak%20ekrana%202026-01-28%20233127.png)
-![Početna 2](screenshots/Snimak%20ekrana%202026-01-28%20233137.png)
-![Početna 3](screenshots/Snimak%20ekrana%202026-01-28%20233148.png)
-![Početna 4](screenshots/Snimak%20ekrana%202026-01-28%20233155.png)
+| | |
+|---|---|
+| ![Početna 1](screenshots/Snimak%20ekrana%202026-01-28%20233127.png) | ![Početna 2](screenshots/Snimak%20ekrana%202026-01-28%20233137.png) |
+| ![Početna 3](screenshots/Snimak%20ekrana%202026-01-28%20233148.png) | ![Početna 4](screenshots/Snimak%20ekrana%202026-01-28%20233155.png) |
 
 ---
 
