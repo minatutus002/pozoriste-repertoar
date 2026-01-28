@@ -1,4 +1,4 @@
-```md
+
 <div align="center">
 
 # 🎭 Pozorište — Repertoar 💗  
@@ -164,5 +164,4 @@ PozoristeRepertoar
 Projekat je razvijen kao studentski rad u okviru kursa iz oblasti softverskog inženjerstva. 💗👩‍💻
 Girl Dev Team ✨
 
-```
-```
+
