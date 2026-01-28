@@ -78,5 +78,20 @@ namespace Pozoriste.DataAccess.Repositories
                 .FirstOrDefaultAsync(t => t.TerminId == id);
         }
 
+        public async Task<Termin?> GetOverlapAsync(int salaId, DateTime start, DateTime end, int? ignoreTerminId = null)
+        {
+            var termini = await _context.Termini
+                .AsNoTracking()
+                .Include(t => t.Predstava)
+                .Where(t => t.SalaId == salaId &&
+                            (!ignoreTerminId.HasValue || t.TerminId != ignoreTerminId.Value))
+                .ToListAsync();
+
+            return termini.FirstOrDefault(t =>
+                t.Predstava != null &&
+                start < t.DatumVreme.AddMinutes(t.Predstava.TrajanjeMin) &&
+                end > t.DatumVreme);
+        }
+
     }
 }

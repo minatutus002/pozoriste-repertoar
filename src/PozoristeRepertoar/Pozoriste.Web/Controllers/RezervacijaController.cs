@@ -229,6 +229,7 @@ namespace Pozoriste.Web.Controllers
                 Cena = termin.Predstava.Cena,
                 BrojRedova = termin.Sala.BrojRedova,
                 SedistaPoRedu = termin.Sala.SedistaPoRedu,
+                Zone = BuildSeatZones(termin.Sala.SalaId, termin.Sala.BrojRedova),
                 Zauzeta = zauzeta,
                 Selected = selected?.ToList() ?? new List<string>()
             };
@@ -267,6 +268,64 @@ namespace Pozoriste.Web.Controllers
                 return ((char)('A' + row - 1)).ToString();
 
             return row.ToString();
+        }
+
+        private static List<SeatZoneVm> BuildSeatZones(int salaId, int brojRedova)
+        {
+            var zones = new List<SeatZoneVm>();
+
+            void AddZone(string naziv, int from, int to, decimal multiplier, string css)
+            {
+                if (from > to || from < 1 || to < 1) return;
+                zones.Add(new SeatZoneVm
+                {
+                    Naziv = naziv,
+                    OdReda = from,
+                    DoReda = to,
+                    CenaMultiplier = multiplier,
+                    CssClass = css
+                });
+            }
+
+            if (brojRedova <= 0)
+                return zones;
+
+            if (salaId == 1)
+            {
+                AddZone("VIP", 1, 2, 1.5m, "zone-vip");
+                AddZone("Premium", 3, Math.Min(6, brojRedova), 1.2m, "zone-premium");
+                if (brojRedova >= 10)
+                    AddZone("Balkon", Math.Max(brojRedova - 3, 7), brojRedova, 0.8m, "zone-balkon");
+                return zones;
+            }
+
+            if (salaId == 2)
+            {
+                AddZone("VIP", 1, 2, 1.5m, "zone-vip");
+                if (brojRedova >= 6)
+                {
+                    AddZone("Standard", 3, brojRedova - 2, 1.0m, "zone-standard");
+                    AddZone("Intimna", brojRedova - 1, brojRedova, 0.9m, "zone-intimna");
+                }
+                else
+                {
+                    AddZone("Standard", 3, brojRedova, 1.0m, "zone-standard");
+                }
+                return zones;
+            }
+
+            AddZone("VIP", 1, Math.Min(2, brojRedova), 1.5m, "zone-vip");
+            if (brojRedova >= 12)
+            {
+                AddZone("Standard", 3, brojRedova - 5, 1.0m, "zone-standard");
+                AddZone("Balkon", brojRedova - 4, brojRedova, 0.8m, "zone-balkon");
+            }
+            else
+            {
+                AddZone("Standard", 3, brojRedova, 1.0m, "zone-standard");
+            }
+
+            return zones;
         }
     }
 }
