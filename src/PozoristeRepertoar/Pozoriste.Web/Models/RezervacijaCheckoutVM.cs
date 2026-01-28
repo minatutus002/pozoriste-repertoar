@@ -13,6 +13,32 @@ namespace Pozoriste.Web.Models
         public string Sedista { get; set; } = string.Empty;
         public RezervacijaStatus Status { get; set; }
 
-        public decimal Ukupno => Cena * BrojKarata;
+        public decimal CenaPoKarti { get; set; }
+        public decimal Ukupno { get; set; }
+        public decimal ProsecnaCenaKarte { get; set; }
+        public List<ZonaCenaStavkaVM> StavkePoZonama { get; set; } = new();
+
+        public List<PriceLineVm> Stavke { get; set; } = new();
+
+
+
+
     }
+
+    public class ZonaCenaStavkaVM
+    {
+        public string Zona { get; set; } = "";
+        public int Kolicina { get; set; }
+        public decimal CenaJedne { get; set; }
+        public decimal Ukupno => decimal.Round(CenaJedne * Kolicina, 2);
+    }
+
+    public class PriceLineVm
+    {
+        public string Zona { get; set; } = "";
+        public int Kolicina { get; set; }
+        public decimal CenaJed { get; set; }
+        public decimal Ukupno { get; set; }
+    }
+
 }

@@ -32,12 +32,14 @@ else
         @foreach (var r in Model)
         {
             var sedista = r.Sedista?
-                .OrderBy(s => s.Red)
-                .ThenBy(s => s.Broj)
-                .Select(s => SeatLabel(s.Red, s.Broj))
-                .ToList() ?? new List<string>();
+            .OrderBy(s => s.Red)
+            .ThenBy(s => s.Broj)
+            .Select(s => SeatLabel(s.Red, s.Broj))
+            .ToList() ?? new List<string>();
 
-            var ukupno = (r.Termin?.Predstava?.Cena ?? 0m) * r.BrojKarata;
+            // UZMI ukupnu cenu iz rezervacije (po zonama), ne baznu cenu predstave
+            var ukupno = r.UkupnaCena;
+
             var statusClass = r.Status switch
             {
                 RezervacijaStatus.Placeno => "bg-success",
@@ -101,6 +103,7 @@ else
                        asp-route-id="@r.RezervacijaId">
                         Detalji
                     </a>
+
                     @if (r.Status == RezervacijaStatus.Rezervisano || r.Status == RezervacijaStatus.Placeno)
                     {
                         <form asp-action="RequestCancel" method="post" class="d-inline">

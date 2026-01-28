@@ -17,5 +17,8 @@ namespace Pozoriste.Models.Entities
         public RezervacijaStatus Status { get; set; } = RezervacijaStatus.Rezervisano;
 
         public ICollection<RezervacijaSediste> Sedista { get; set; } = new List<RezervacijaSediste>();
+
+        public decimal UkupnaCena { get; set; }
+
     }
 }

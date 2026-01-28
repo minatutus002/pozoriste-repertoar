@@ -12,5 +12,9 @@ namespace Pozoriste.Models.Entities
 
         public int Red { get; set; }
         public int Broj { get; set; }
+
+        public decimal Cena { get; set; }
+        public string Zona { get; set; } = "";
+
     }
 }

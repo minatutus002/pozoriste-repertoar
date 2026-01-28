@@ -16,9 +16,10 @@ namespace Pozoriste.Web.Controllers
         private readonly ITerminRepository _terminRepo;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public RezervacijaController(PozoristeDbContext db,
-                                     ITerminRepository terminRepo,
-                                     UserManager<IdentityUser> userManager)
+        public RezervacijaController(
+            PozoristeDbContext db,
+            ITerminRepository terminRepo,
+            UserManager<IdentityUser> userManager)
         {
             _db = db;
             _terminRepo = terminRepo;
@@ -33,10 +34,8 @@ namespace Pozoriste.Web.Controllers
             var rezervacije = await _db.Rezervacije
                 .AsNoTracking()
                 .Where(r => r.KorisnikId == user.Id)
-                .Include(r => r.Termin)
-                    .ThenInclude(t => t.Predstava)
-                .Include(r => r.Termin)
-                    .ThenInclude(t => t.Sala)
+                .Include(r => r.Termin).ThenInclude(t => t.Predstava)
+                .Include(r => r.Termin).ThenInclude(t => t.Sala)
                 .Include(r => r.Sedista)
                 .OrderByDescending(r => r.DatumKreiranja)
                 .ToListAsync();
@@ -47,7 +46,7 @@ namespace Pozoriste.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int terminId)
         {
-            var vm = await BuildSeatVmAsync(terminId, null);
+            var vm = await BuildSeatVmAsync(terminId, selected: null);
             if (vm == null) return NotFound();
             return View(vm);
         }
@@ -100,27 +99,44 @@ namespace Pozoriste.Web.Controllers
                 return View(retry);
             }
 
+            // Zone + cene
+            var zones = BuildSeatZones(termin.Sala.SalaId, termin.Sala.BrojRedova);
+
+            decimal ukupnaCena = 0m;
+
             var rez = new Rezervacija
             {
                 TerminId = vm.TerminId,
                 KorisnikId = user.Id,
                 BrojKarata = parsed.Count,
                 DatumKreiranja = DateTime.Now,
-                Status = RezervacijaStatus.Rezervisano
+                Status = RezervacijaStatus.Rezervisano,
+                UkupnaCena = 0m
             };
 
-            _db.Rezervacije.Add(rez);
-            await _db.SaveChangesAsync();
-
-            var sedista = parsed.Select(p => new RezervacijaSediste
+            // Sedista vezujemo preko navigacije (EF ce sam popuniti FK)
+            var sedista = parsed.Select(p =>
             {
-                RezervacijaId = rez.RezervacijaId,
-                TerminId = vm.TerminId,
-                Red = p.Row,
-                Broj = p.Seat
+                var zona = zones.FirstOrDefault(z => p.Row >= z.OdReda && p.Row <= z.DoReda);
+                var multiplier = zona?.CenaMultiplier ?? 1.0m;
+
+                var cenaSedista = decimal.Round(termin.Predstava.Cena * multiplier, 2);
+                ukupnaCena += cenaSedista;
+
+                return new RezervacijaSediste
+                {
+                    TerminId = vm.TerminId,
+                    Red = p.Row,
+                    Broj = p.Seat,
+                    Cena = cenaSedista,
+                    Zona = zona?.Naziv ?? "Standard"
+                };
             }).ToList();
 
-            _db.RezervacijaSedista.AddRange(sedista);
+            rez.UkupnaCena = decimal.Round(ukupnaCena, 2);
+            rez.Sedista = sedista;
+
+            _db.Rezervacije.Add(rez);
 
             try
             {
@@ -128,7 +144,9 @@ namespace Pozoriste.Web.Controllers
             }
             catch (DbUpdateException)
             {
-                ModelState.AddModelError(nameof(vm.Selected), "Izabrana sedista su upravo zauzeta. Pokusajte ponovo.");
+                ModelState.AddModelError(nameof(vm.Selected),
+                    "Izabrana sedista su upravo zauzeta. Pokusajte ponovo.");
+
                 var retry = await BuildSeatVmAsync(vm.TerminId, selected);
                 if (retry == null) return NotFound();
                 return View(retry);
@@ -145,14 +163,27 @@ namespace Pozoriste.Web.Controllers
 
             var rez = await _db.Rezervacije
                 .AsNoTracking()
-                .Include(r => r.Termin)
-                    .ThenInclude(t => t.Predstava)
-                .Include(r => r.Termin)
-                    .ThenInclude(t => t.Sala)
+                .Include(r => r.Termin).ThenInclude(t => t.Predstava)
+                .Include(r => r.Termin).ThenInclude(t => t.Sala)
                 .Include(r => r.Sedista)
                 .FirstOrDefaultAsync(r => r.RezervacijaId == id && r.KorisnikId == user.Id);
 
             if (rez == null) return NotFound();
+
+            var ukupno = decimal.Round(rez.UkupnaCena, 2);
+
+            // grupisanje po zoni + ceni (jer zona moze imati istu cenu, ali i da bude sigurno)
+            var stavke = rez.Sedista
+                .GroupBy(s => new { s.Zona, s.Cena })
+                .Select(g => new PriceLineVm
+                {
+                    Zona = string.IsNullOrWhiteSpace(g.Key.Zona) ? "Standard" : g.Key.Zona,
+                    CenaJed = decimal.Round(g.Key.Cena, 2),
+                    Kolicina = g.Count(),
+                    Ukupno = decimal.Round(g.Sum(x => x.Cena), 2)
+                })
+                .OrderByDescending(x => x.CenaJed) // VIP gore, pa premium, pa standard (približno)
+                .ToList();
 
             var vm = new RezervacijaCheckoutVM
             {
@@ -161,8 +192,9 @@ namespace Pozoriste.Web.Controllers
                 Sala = rez.Termin?.Sala?.Naziv ?? "-",
                 DatumVreme = rez.Termin?.DatumVreme ?? DateTime.MinValue,
                 BrojKarata = rez.BrojKarata,
-                Cena = rez.Termin?.Predstava?.Cena ?? 0m,
+                Ukupno = ukupno,
                 Status = rez.Status,
+                Stavke = stavke,
                 Sedista = string.Join(", ", rez.Sedista
                     .OrderBy(s => s.Red)
                     .ThenBy(s => s.Broj)
@@ -172,6 +204,7 @@ namespace Pozoriste.Web.Controllers
             return View(vm);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pay(int id)
@@ -179,7 +212,9 @@ namespace Pozoriste.Web.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            var rez = await _db.Rezervacije.FirstOrDefaultAsync(r => r.RezervacijaId == id && r.KorisnikId == user.Id);
+            var rez = await _db.Rezervacije
+                .FirstOrDefaultAsync(r => r.RezervacijaId == id && r.KorisnikId == user.Id);
+
             if (rez == null) return NotFound();
 
             if (rez.Status == RezervacijaStatus.Rezervisano)
@@ -200,6 +235,7 @@ namespace Pozoriste.Web.Controllers
 
             var rez = await _db.Rezervacije
                 .FirstOrDefaultAsync(r => r.RezervacijaId == id && r.KorisnikId == user.Id);
+
             if (rez == null) return NotFound();
 
             if (rez.Status == RezervacijaStatus.Rezervisano)
@@ -226,7 +262,7 @@ namespace Pozoriste.Web.Controllers
                 Predstava = termin.Predstava.Naziv,
                 Sala = termin.Sala.Naziv,
                 DatumVreme = termin.DatumVreme,
-                Cena = termin.Predstava.Cena,
+                Cena = termin.Predstava.Cena, // bazna cena
                 BrojRedova = termin.Sala.BrojRedova,
                 SedistaPoRedu = termin.Sala.SedistaPoRedu,
                 Zone = BuildSeatZones(termin.Sala.SalaId, termin.Sala.BrojRedova),
@@ -277,6 +313,7 @@ namespace Pozoriste.Web.Controllers
             void AddZone(string naziv, int from, int to, decimal multiplier, string css)
             {
                 if (from > to || from < 1 || to < 1) return;
+
                 zones.Add(new SeatZoneVm
                 {
                     Naziv = naziv,
@@ -302,6 +339,7 @@ namespace Pozoriste.Web.Controllers
             if (salaId == 2)
             {
                 AddZone("VIP", 1, 2, 1.5m, "zone-vip");
+
                 if (brojRedova >= 6)
                 {
                     AddZone("Standard", 3, brojRedova - 2, 1.0m, "zone-standard");
@@ -311,10 +349,12 @@ namespace Pozoriste.Web.Controllers
                 {
                     AddZone("Standard", 3, brojRedova, 1.0m, "zone-standard");
                 }
+
                 return zones;
             }
 
             AddZone("VIP", 1, Math.Min(2, brojRedova), 1.5m, "zone-vip");
+
             if (brojRedova >= 12)
             {
                 AddZone("Standard", 3, brojRedova - 5, 1.0m, "zone-standard");

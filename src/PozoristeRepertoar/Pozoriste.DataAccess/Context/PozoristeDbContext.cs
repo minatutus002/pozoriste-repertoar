@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Pozoriste.Models.Entities;
 
 namespace Pozoriste.DataAccess.Context
@@ -56,8 +56,16 @@ namespace Pozoriste.DataAccess.Context
                 .HasIndex(rs => new { rs.TerminId, rs.Red, rs.Broj })
                 .IsUnique();
 
-            // Ako property u klasi jeste KorisnikId, NEMA potrebe za mapiranjem imena kolone.
-            // (Samo pazi da ti i tabela ima kolonu KorisnikId.)
+
+            modelBuilder.Entity<Rezervacija>()
+                .Property(x => x.UkupnaCena)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<RezervacijaSediste>()
+                .Property(x => x.Cena)
+                .HasPrecision(18, 2);
+
+            
         }
     }
 }
