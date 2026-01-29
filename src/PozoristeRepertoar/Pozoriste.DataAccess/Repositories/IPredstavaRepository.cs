@@ -13,6 +13,7 @@ namespace Pozoriste.DataAccess.Repositories
         Task UpdateAsync(Predstava predstava);
         Task DeleteAsync(int id);
 
+        Task<List<int>> GetGlumacIdsAsync(int predstavaId);
         Task UpdateGlumciAsync(int predstavaId, List<int> glumacIds);
 
     }
