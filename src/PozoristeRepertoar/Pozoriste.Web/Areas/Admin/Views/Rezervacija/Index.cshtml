@@ -57,9 +57,10 @@
                 </td>
                 <td>@r.Ukupno.ToString("0.00")</td>
                 <td class="text-end">
+                    <div class="d-flex flex-wrap gap-2 justify-content-end">
                     @if (r.Status == RezervacijaStatus.Rezervisano)
                     {
-                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="MarkPaid" method="post" class="d-inline">
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="MarkPaid" method="post" class="m-0">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@r.RezervacijaId" />
                             <button class="btn btn-sm btn-outline-success">Oznaci placeno</button>
@@ -68,7 +69,7 @@
                     @if (r.Status == RezervacijaStatus.OtkazivanjeNaCekanju ||
                          r.Status == RezervacijaStatus.OtkazivanjeNaCekanjuPlaceno)
                     {
-                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="ApproveCancel" method="post" class="d-inline">
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="ApproveCancel" method="post" class="m-0">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@r.RezervacijaId" />
                             <button class="btn btn-sm btn-outline-success"
@@ -76,7 +77,7 @@
                                 Odobri otkaz
                             </button>
                         </form>
-                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="RejectCancel" method="post" class="d-inline">
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="RejectCancel" method="post" class="m-0">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@r.RezervacijaId" />
                             <button class="btn btn-sm btn-outline-danger"
@@ -88,7 +89,7 @@
                     @if (r.Status == RezervacijaStatus.Otkazano ||
                          r.Status == RezervacijaStatus.Refundiran)
                     {
-                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="DeleteCanceled" method="post" class="d-inline">
+                        <form asp-area="Admin" asp-controller="Rezervacija" asp-action="DeleteCanceled" method="post" class="m-0">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@r.RezervacijaId" />
                             <button class="btn btn-sm btn-outline-danger"
@@ -97,6 +98,7 @@
                             </button>
                         </form>
                     }
+                    </div>
                 </td>
             </tr>
         }
