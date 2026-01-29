@@ -67,6 +67,7 @@ namespace Pozoriste.Web.Controllers
                 
                 Glumci = predstava.Glumci
                     .Select(x => x.Glumac.PunoIme)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
                     .OrderBy(x => x)
                     .ToList(),
 
