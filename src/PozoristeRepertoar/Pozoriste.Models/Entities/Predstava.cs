@@ -15,5 +15,8 @@ namespace Pozoriste.Models.Entities
         public int ZanrId { get; set; }
 
         public Zanr? Zanr { get; set; }
+
+        public ICollection<PredstavaGlumac> Glumci { get; set; } = new List<PredstavaGlumac>();
+
     }
 }

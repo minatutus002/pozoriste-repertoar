@@ -30,6 +30,8 @@ namespace Pozoriste.Web.Controllers
             var predstava = await _db.Predstave
                 .AsNoTracking()
                 .Include(p => p.Zanr)
+                .Include(p => p.Glumci)
+                    .ThenInclude(pg => pg.Glumac)
                 .FirstOrDefaultAsync(p => p.PredstavaId == id);
 
             if (predstava == null) return NotFound();
@@ -61,6 +63,13 @@ namespace Pozoriste.Web.Controllers
                 SlikaUrl = predstava.SlikaUrl,
                 Cena = predstava.Cena,
                 TrajanjeMin = predstava.TrajanjeMin,
+
+                
+                Glumci = predstava.Glumci
+                    .Select(x => x.Glumac.PunoIme)
+                    .OrderBy(x => x)
+                    .ToList(),
+
                 Termini = termini.Select(t =>
                 {
                     var reserved = zauzeta.TryGetValue(t.TerminId, out var count) ? count : 0;
@@ -80,5 +89,6 @@ namespace Pozoriste.Web.Controllers
 
             return View(vm);
         }
+
     }
 }

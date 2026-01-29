@@ -23,5 +23,8 @@ namespace Pozoriste.Web.Models
             public int Kapacitet { get; set; }
             public int Slobodno { get; set; }
         }
+
+        public List<string> Glumci { get; set; } = new();
+
     }
 }

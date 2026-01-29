@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pozoriste.DataAccess.Context;
 using Pozoriste.DataAccess.Repositories;
@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // --- DB (tvoja app baza) ---
 builder.Services.AddScoped<IRezervacijaRepository, RezervacijaRepository>();
+
+builder.Services.AddScoped<IGlumacRepository, GlumacRepository>();
+
 
 builder.Services.AddDbContext<PozoristeDbContext>(options =>
     options.UseSqlServer(
