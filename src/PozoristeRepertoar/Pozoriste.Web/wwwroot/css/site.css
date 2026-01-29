@@ -823,6 +823,56 @@ h1, h2, h3, h4, h5 {
 }
 
 /* =========================
+   IDENTITY MANAGE
+   ========================= */
+
+.manage-shell {
+    margin-top: 1rem;
+}
+
+.manage-nav {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+}
+
+.manage-nav .nav {
+    gap: 8px;
+}
+
+.manage-nav .nav-link {
+    color: var(--text);
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.manage-nav .nav-link:hover {
+    background: rgba(122,30,43,0.08);
+    border-color: rgba(122,30,43,0.25);
+    color: var(--text);
+}
+
+.manage-nav .nav-link.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(122,30,43,0.2);
+}
+
+.manage-content {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+}
+
+/* =========================
    HOME
    ========================= */
 
