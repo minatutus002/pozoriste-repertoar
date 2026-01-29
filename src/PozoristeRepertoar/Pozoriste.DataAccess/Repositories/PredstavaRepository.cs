@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Pozoriste.DataAccess.Context;
 using Pozoriste.Models.Entities;
 using System.Collections.Generic;
@@ -53,5 +53,30 @@ namespace Pozoriste.DataAccess.Repositories
             _db.Predstave.Remove(entity);
             await _db.SaveChangesAsync();
         }
+
+        public async Task UpdateGlumciAsync(int predstavaId, List<int> glumacIds)
+        {
+            var predstava = await _db.Predstave
+                .Include(p => p.Glumci)
+                .FirstOrDefaultAsync(p => p.PredstavaId == predstavaId);
+
+            if (predstava == null) return;
+
+            // ukloni stare
+            predstava.Glumci.Clear();
+
+            // dodaj nove (distinct da ne duplira)
+            foreach (var gid in glumacIds.Distinct())
+            {
+                predstava.Glumci.Add(new PredstavaGlumac
+                {
+                    PredstavaId = predstavaId,
+                    GlumacId = gid
+                });
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
     }
 }

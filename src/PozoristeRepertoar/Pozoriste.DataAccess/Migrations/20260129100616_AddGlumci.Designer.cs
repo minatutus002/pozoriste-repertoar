@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pozoriste.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using Pozoriste.DataAccess.Context;
 namespace Pozoriste.DataAccess.Migrations
 {
     [DbContext(typeof(PozoristeDbContext))]
-    partial class PozoristeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129100616_AddGlumci")]
+    partial class AddGlumci
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,10 +40,7 @@ namespace Pozoriste.DataAccess.Migrations
 
                     b.HasKey("GlumacId");
 
-                    b.HasIndex("PunoIme")
-                        .IsUnique();
-
-                    b.ToTable("Glumci", (string)null);
+                    b.ToTable("Glumci");
                 });
 
             modelBuilder.Entity("Pozoriste.Models.Entities.Predstava", b =>
@@ -90,7 +90,7 @@ namespace Pozoriste.DataAccess.Migrations
 
                     b.HasIndex("GlumacId");
 
-                    b.ToTable("PredstavaGlumci", (string)null);
+                    b.ToTable("PredstavaGlumci");
                 });
 
             modelBuilder.Entity("Pozoriste.Models.Entities.Rezervacija", b =>
