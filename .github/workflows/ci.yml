@@ -16,10 +16,10 @@ jobs:
 
     strategy:
       matrix:
-        dotnet-version: [7.0]
+        dotnet-version: [8.0]
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup .NET
@@ -31,20 +31,15 @@ jobs:
         run: dotnet restore
         working-directory: src/PozoristeRepertoar
 
-
-
-      - name: Build
-        run: dotnet build --no-restore
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
         working-directory: src/PozoristeRepertoar
-
 
       - name: Run tests
-        run: | 
-          dotnet test --no-build --verbosity normal || true
+        run: dotnet test --no-build --configuration Release --verbosity normal
         working-directory: src/PozoristeRepertoar
 
-
-      - name: Upload build artifacts (optional)
+      - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
