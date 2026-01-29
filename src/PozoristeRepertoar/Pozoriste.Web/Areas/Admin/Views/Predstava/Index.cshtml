@@ -52,17 +52,19 @@
                 <td>@p.Cena.ToString("0.00")</td>
                 <td>@p.TrajanjeMin min</td>
                 <td class="text-end">
-                    <a class="btn btn-sm btn-outline-secondary"
-                       asp-area="Admin" asp-controller="Predstava" asp-action="Edit" asp-route-id="@p.PredstavaId">Izmeni</a>
+                    <div class="d-flex flex-column gap-2 align-items-end">
+                        <a class="btn btn-sm btn-outline-secondary"
+                           asp-area="Admin" asp-controller="Predstava" asp-action="Edit" asp-route-id="@p.PredstavaId">Izmeni</a>
 
-                    <form asp-area="Admin" asp-controller="Predstava" asp-action="Delete" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@p.PredstavaId" />
-                        <button class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('Obrisati predstavu?');">
-                            Obriši
-                        </button>
-                    </form>
+                        <form asp-area="Admin" asp-controller="Predstava" asp-action="Delete" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@p.PredstavaId" />
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Obrisati predstavu?');">
+                                Obriši
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
         }
