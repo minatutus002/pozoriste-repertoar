@@ -13,7 +13,6 @@ namespace Pozoriste.Web.Models
         public decimal Cena { get; set; }
         public RezervacijaStatus Status { get; set; }
         public string Sedista { get; set; } = string.Empty;
-
-        public decimal Ukupno => Cena * BrojKarata;
+        public decimal Ukupno { get; set; }
     }
 }

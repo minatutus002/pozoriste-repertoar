@@ -42,20 +42,36 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
                 u => u.Id,
                 u => string.IsNullOrWhiteSpace(u.Email) ? (u.UserName ?? u.Id) : u.Email!);
 
-            var model = rezervacije.Select(r => new AdminRezervacijaRowVM
+            var model = rezervacije.Select(r =>
             {
-                RezervacijaId = r.RezervacijaId,
-                KorisnikEmail = emailById.GetValueOrDefault(r.KorisnikId, r.KorisnikId),
-                Predstava = r.Termin?.Predstava?.Naziv ?? "-",
-                Sala = r.Termin?.Sala?.Naziv ?? "-",
-                DatumVreme = r.Termin?.DatumVreme ?? DateTime.MinValue,
-                BrojKarata = r.BrojKarata,
-                Cena = r.Termin?.Predstava?.Cena ?? 0m,
-                Status = r.Status,
-                Sedista = string.Join(", ", r.Sedista
-                    .OrderBy(s => s.Red)
-                    .ThenBy(s => s.Broj)
-                    .Select(s => $"{GetRowLabel(s.Red)}{s.Broj}"))
+                var ukupno = r.UkupnaCena;
+
+                if (ukupno <= 0m && r.Sedista != null && r.Sedista.Count > 0)
+                    ukupno = r.Sedista.Sum(s => s.Cena);
+
+                if (ukupno <= 0m)
+                    ukupno = (r.Termin?.Predstava?.Cena ?? 0m) * r.BrojKarata;
+
+                ukupno = decimal.Round(ukupno, 2);
+
+                var sedista = r.Sedista ?? new List<RezervacijaSediste>();
+
+                return new AdminRezervacijaRowVM
+                {
+                    RezervacijaId = r.RezervacijaId,
+                    KorisnikEmail = emailById.GetValueOrDefault(r.KorisnikId, r.KorisnikId),
+                    Predstava = r.Termin?.Predstava?.Naziv ?? "-",
+                    Sala = r.Termin?.Sala?.Naziv ?? "-",
+                    DatumVreme = r.Termin?.DatumVreme ?? DateTime.MinValue,
+                    BrojKarata = r.BrojKarata,
+                    Cena = r.Termin?.Predstava?.Cena ?? 0m,
+                    Ukupno = ukupno,
+                    Status = r.Status,
+                    Sedista = string.Join(", ", sedista
+                        .OrderBy(s => s.Red)
+                        .ThenBy(s => s.Broj)
+                        .Select(s => $"{GetRowLabel(s.Red)}{s.Broj}"))
+                };
             }).ToList();
 
             return View(model);
