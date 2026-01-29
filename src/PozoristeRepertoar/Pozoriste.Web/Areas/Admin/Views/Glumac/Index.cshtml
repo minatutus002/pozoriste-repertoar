@@ -1,0 +1,51 @@
+@model IEnumerable<Pozoriste.Models.Entities.Glumac>
+@{
+    ViewData["Title"] = "Glumci";
+    var query = ViewBag.Query as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Glumci</h2>
+    <a class="btn btn-primary" asp-area="Admin" asp-controller="Glumac" asp-action="Create">+ Dodaj</a>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-6 col-md-4">
+        <label class="form-label">Pretraga po imenu</label>
+        <input class="form-control" type="text" name="q" value="@query" placeholder="Unesite ime..." />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Trazi</button>
+        <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Glumac" asp-action="Index">Reset</a>
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Puno ime</th>
+            <th class="text-end"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var g in Model)
+        {
+            <tr>
+                <td>@g.PunoIme</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary"
+                       asp-area="Admin" asp-controller="Glumac" asp-action="Edit" asp-route-id="@g.GlumacId">Izmeni</a>
+
+                    <form asp-area="Admin" asp-controller="Glumac" asp-action="Delete" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@g.GlumacId" />
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Obrisati glumca?');">
+                            Obrisi
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

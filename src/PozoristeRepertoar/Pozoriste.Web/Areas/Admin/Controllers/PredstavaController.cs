@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Pozoriste.DataAccess.Context;
 using Pozoriste.Models.Entities;
+using Pozoriste.Web.Models;
 using System.IO;
 
 namespace Pozoriste.Web.Areas.Admin.Controllers
@@ -29,28 +30,41 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
         }
 
         public async Task<IActionResult> Index()
-            => View(await _db.Predstave
+        {
+            var predstave = await _db.Predstave
                 .AsNoTracking()
                 .Include(p => p.Zanr)
+                .Include(p => p.Glumci)
+                    .ThenInclude(pg => pg.Glumac)
                 .OrderBy(p => p.Naziv)
-                .ToListAsync());
+                .ToListAsync();
+
+            return View(predstave);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             await FillZanroviAsync();
-            return View(new Predstava { Cena = 500 });
+
+            var vm = new PredstavaAdminVM
+            {
+                Cena = 500,
+                Glumci = await GetGlumciSelectListAsync()
+            };
+
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Predstava model, IFormFile? slika)
+        public async Task<IActionResult> Create(PredstavaAdminVM model, IFormFile? slika)
         {
             if (slika != null && slika.Length > 0)
             {
                 if (!TryValidateImage(slika, out var error))
                 {
-                    ModelState.AddModelError(nameof(Predstava.SlikaUrl), error);
+                    ModelState.AddModelError(nameof(PredstavaAdminVM.SlikaUrl), error);
                 }
                 else
                 {
@@ -61,26 +75,64 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 await FillZanroviAsync();
+                model.Glumci = await GetGlumciSelectListAsync(model.SelectedGlumciIds);
                 return View(model);
             }
 
-            _db.Predstave.Add(model);
+            var entity = new Predstava
+            {
+                Naziv = model.Naziv,
+                Opis = model.Opis,
+                Cena = model.Cena,
+                TrajanjeMin = model.TrajanjeMin,
+                ZanrId = model.ZanrId,
+                SlikaUrl = model.SlikaUrl
+            };
+
+            _db.Predstave.Add(entity);
             await _db.SaveChangesAsync();
+
+            var selectedIds = await GetValidGlumacIdsAsync(model.SelectedGlumciIds);
+            await SyncGlumciAsync(entity.PredstavaId, selectedIds);
+            await _db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var item = await _db.Predstave.FindAsync(id);
-            if (item == null) return NotFound();
+            var entity = await _db.Predstave.AsNoTracking()
+                .FirstOrDefaultAsync(p => p.PredstavaId == id);
+            if (entity == null) return NotFound();
+
+            var selectedIds = await _db.PredstavaGlumci
+                .AsNoTracking()
+                .Where(pg => pg.PredstavaId == id)
+                .Select(pg => pg.GlumacId)
+                .ToListAsync();
+
             await FillZanroviAsync();
-            return View(item);
+
+            var vm = new PredstavaAdminVM
+            {
+                PredstavaId = entity.PredstavaId,
+                Naziv = entity.Naziv,
+                Opis = entity.Opis,
+                SlikaUrl = entity.SlikaUrl,
+                Cena = entity.Cena,
+                TrajanjeMin = entity.TrajanjeMin,
+                ZanrId = entity.ZanrId,
+                SelectedGlumciIds = selectedIds,
+                Glumci = await GetGlumciSelectListAsync(selectedIds)
+            };
+
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Predstava model, IFormFile? slika)
+        public async Task<IActionResult> Edit(PredstavaAdminVM model, IFormFile? slika)
         {
             var entity = await _db.Predstave.FindAsync(model.PredstavaId);
             if (entity == null) return NotFound();
@@ -89,7 +141,7 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
             {
                 if (!TryValidateImage(slika, out var error))
                 {
-                    ModelState.AddModelError(nameof(Predstava.SlikaUrl), error);
+                    ModelState.AddModelError(nameof(PredstavaAdminVM.SlikaUrl), error);
                 }
             }
 
@@ -97,6 +149,7 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
             {
                 await FillZanroviAsync();
                 model.SlikaUrl = entity.SlikaUrl;
+                model.Glumci = await GetGlumciSelectListAsync(model.SelectedGlumciIds);
                 return View(model);
             }
 
@@ -111,6 +164,9 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
                 TryDeleteImage(entity.SlikaUrl);
                 entity.SlikaUrl = await SaveImageAsync(slika);
             }
+
+            var selectedIds = await GetValidGlumacIdsAsync(model.SelectedGlumciIds);
+            await SyncGlumciAsync(entity.PredstavaId, selectedIds);
 
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -185,6 +241,62 @@ namespace Pozoriste.Web.Areas.Admin.Controllers
         {
             var zanrovi = await _db.Zanrovi.AsNoTracking().OrderBy(z => z.Naziv).ToListAsync();
             ViewBag.Zanrovi = new SelectList(zanrovi, "ZanrId", "Naziv");
+        }
+
+        private async Task<List<SelectListItem>> GetGlumciSelectListAsync(IEnumerable<int>? selectedIds = null)
+        {
+            var glumci = await _db.Glumci.AsNoTracking()
+                .OrderBy(g => g.PunoIme)
+                .ToListAsync();
+
+            var selected = selectedIds != null
+                ? new HashSet<int>(selectedIds)
+                : new HashSet<int>();
+
+            return glumci.Select(g => new SelectListItem
+            {
+                Value = g.GlumacId.ToString(),
+                Text = g.PunoIme,
+                Selected = selected.Contains(g.GlumacId)
+            }).ToList();
+        }
+
+        private async Task<List<int>> GetValidGlumacIdsAsync(IEnumerable<int>? selectedIds)
+        {
+            var distinctIds = selectedIds?
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList() ?? new List<int>();
+
+            if (distinctIds.Count == 0) return new List<int>();
+
+            return await _db.Glumci.AsNoTracking()
+                .Where(g => distinctIds.Contains(g.GlumacId))
+                .Select(g => g.GlumacId)
+                .ToListAsync();
+        }
+
+        private async Task SyncGlumciAsync(int predstavaId, List<int> selectedIds)
+        {
+            var existing = await _db.PredstavaGlumci
+                .Where(pg => pg.PredstavaId == predstavaId)
+                .ToListAsync();
+
+            var toRemove = existing.Where(pg => !selectedIds.Contains(pg.GlumacId)).ToList();
+            if (toRemove.Count > 0)
+                _db.PredstavaGlumci.RemoveRange(toRemove);
+
+            var existingIds = existing.Select(pg => pg.GlumacId).ToHashSet();
+            var toAdd = selectedIds.Where(id => !existingIds.Contains(id)).ToList();
+
+            foreach (var gid in toAdd)
+            {
+                _db.PredstavaGlumci.Add(new PredstavaGlumac
+                {
+                    PredstavaId = predstavaId,
+                    GlumacId = gid
+                });
+            }
         }
     }
 }

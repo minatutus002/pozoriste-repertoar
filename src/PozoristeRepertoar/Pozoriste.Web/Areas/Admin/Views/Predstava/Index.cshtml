@@ -14,6 +14,7 @@
             <th>Slika</th>
             <th>Naziv</th>
             <th>Zanr</th>
+            <th>Glumci</th>
             <th>Cena</th>
             <th>Trajanje</th>
             <th class="text-end"></th>
@@ -35,6 +36,19 @@
                 </td>
                 <td>@(p.Naziv ?? "-")</td>
                 <td>@(p.Zanr?.Naziv ?? "-")</td>
+                <td>
+                    @if (p.Glumci != null && p.Glumci.Any())
+                    {
+                        @string.Join(", ", p.Glumci
+                            .Select(pg => pg.Glumac?.PunoIme)
+                            .Where(x => !string.IsNullOrWhiteSpace(x))
+                            .OrderBy(x => x))
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </td>
                 <td>@p.Cena.ToString("0.00")</td>
                 <td>@p.TrajanjeMin min</td>
                 <td class="text-end">

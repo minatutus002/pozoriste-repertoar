@@ -1,4 +1,4 @@
-@model Pozoriste.Models.Entities.Predstava
+@model Pozoriste.Web.Models.PredstavaAdminVM
 @{
     ViewData["Title"] = "Dodaj predstavu";
 }
@@ -49,6 +49,42 @@
         </div>
     </div>
 
+    <div class="mb-3 mt-3">
+        <label class="form-label">Glumci</label>
+        <div class="dropdown w-100" id="glumciDropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false">
+                <span class="glumci-label">Izaberi glumce</span>
+            </button>
+            <div class="dropdown-menu w-100 p-3" style="max-height: 260px; overflow: auto;">
+                @if (Model.Glumci != null && Model.Glumci.Any())
+                {
+                    foreach (var g in Model.Glumci)
+                    {
+                        var id = $"glumac_{g.Value}";
+                        <div class="form-check">
+                            <input class="form-check-input glumci-check"
+                                   type="checkbox"
+                                   name="SelectedGlumciIds"
+                                   value="@g.Value"
+                                   id="@id"
+                                   @(g.Selected ? "checked" : null) />
+                            <label class="form-check-label" for="@id">@g.Text</label>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">Nema glumaca.</div>
+                }
+            </div>
+        </div>
+        <div class="form-text">Izaberi jednog ili vise glumaca.</div>
+    </div>
+
     <div class="mt-4">
         <button class="btn btn-primary" type="submit">Sacuvaj</button>
         <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Predstava" asp-action="Index">Nazad</a>
@@ -57,4 +93,30 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var root = document.getElementById("glumciDropdown");
+            if (!root) return;
+            var label = root.querySelector(".glumci-label");
+            var checks = root.querySelectorAll(".glumci-check");
+            function updateLabel() {
+                var selected = [];
+                checks.forEach(function (c) {
+                    if (c.checked) {
+                        var lbl = root.querySelector("label[for='" + c.id + "']");
+                        if (lbl) selected.push(lbl.textContent.trim());
+                    }
+                });
+                if (selected.length === 0) {
+                    label.textContent = "Izaberi glumce";
+                } else if (selected.length <= 3) {
+                    label.textContent = selected.join(", ");
+                } else {
+                    label.textContent = selected.length + " izabrano";
+                }
+            }
+            checks.forEach(function (c) { c.addEventListener("change", updateLabel); });
+            updateLabel();
+        })();
+    </script>
 }
