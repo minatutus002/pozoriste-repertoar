@@ -54,6 +54,15 @@ namespace Pozoriste.DataAccess.Repositories
             await _db.SaveChangesAsync();
         }
 
+        public Task<List<int>> GetGlumacIdsAsync(int predstavaId)
+        {
+            return _db.PredstavaGlumci
+                .AsNoTracking()
+                .Where(pg => pg.PredstavaId == predstavaId)
+                .Select(pg => pg.GlumacId)
+                .ToListAsync();
+        }
+
         public async Task UpdateGlumciAsync(int predstavaId, List<int> glumacIds)
         {
             var predstava = await _db.Predstave
